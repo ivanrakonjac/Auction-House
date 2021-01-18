@@ -9,7 +9,9 @@ namespace AuctionHouse.Models.Database{
         [Required]
         public string firstName {get; set; }
         [Required]
-        public string lastName {get; set; }  
+        public string lastName {get; set; }
+        [Required]
+        public string gender {get; set; }  
     }
     
 }

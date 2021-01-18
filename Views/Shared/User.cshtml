@@ -1,0 +1,20 @@
+@using Microsoft.AspNetCore.Identity
+@using AuctionHouse.Models.Database
+@using System.Security.Claims
+@inject SignInManager<User> signInManager
+
+@{
+    string fullName = "";
+    foreach (Claim claim in User.Claims){
+        if(claim.Type.Equals ("fullName")){
+            fullName = claim.Value;
+            break;
+        }
+    }
+}
+
+<ul class="navbar-nav">
+    <li>
+        <a class="nav-link text-dark" asp-controller="User" asp-action="Register">Register</a>
+    </li>
+</ul>

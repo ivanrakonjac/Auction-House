@@ -6,7 +6,7 @@ namespace AuctionHouse.Models.Database {
     public class AuctionHouseContext : IdentityDbContext<User> {
 
         // Konstruktor je tu zbog dependency injectiona
-        public AuctionHouseContext ( DbContextOptions options ) : base (options) { }
+        public AuctionHouseContext ( DbContextOptions<AuctionHouseContext> options ) : base (options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -18,4 +18,4 @@ namespace AuctionHouse.Models.Database {
         
     }
 
-}
+} 

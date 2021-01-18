@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using AuctionHouse.Models.View;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
@@ -7,11 +8,35 @@ namespace AuctionHouse.Models.Database{
 
     public class User : IdentityUser{
         [Required]
+        [Display (Name = "Ime")]
         public string firstName {get; set; }
         [Required]
+        [Display (Name = "Prezime")]
         public string lastName {get; set; }
         [Required]
+        [Display (Name = "Pol")]
         public string gender {get; set; }  
+    }
+
+    // Klasa koja mapira RegisterModel (koji dobijamo pri registraciji) u User entitet 
+    public class UserProfile : Profile {
+        public UserProfile(){
+            base.CreateMap<RegisterModel, User> ( )
+                .ForMember(
+                    destination => destination.Email,
+                    options => options.MapFrom (data => data.email)
+                )
+                .ForMember(
+                    destination => destination.UserName,
+                    options => options.MapFrom (data => data.username)
+                )
+                .ForMember(
+                    destination => destination.gender,
+                    options => options.MapFrom (data => data.gender)
+                )
+                .ReverseMap ( );
+                
+        }
     }
     
 }

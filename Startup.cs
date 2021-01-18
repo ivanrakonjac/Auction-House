@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Models.Database;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -39,6 +40,10 @@ namespace AuctionHouse
                 }
              )
              .AddEntityFrameworkStores<AuctionHouseContext> ( ); // Setujemo koju bazu podataka koristimo
+
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+
+            services.AddAutoMapper (typeof(Startup));
 
             services.AddControllersWithViews();
         }

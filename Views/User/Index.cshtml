@@ -32,7 +32,11 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+
+    string backgroundColor = "table-default";
+    if(item.deletedByAdmin) { backgroundColor = "table-danger";}
+
+        <tr class = @backgroundColor >
             <td>
                 @Html.DisplayFor(modelItem => item.firstName)
             </td>
@@ -51,7 +55,7 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="DeleteByAdmin" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

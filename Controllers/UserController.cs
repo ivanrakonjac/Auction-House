@@ -158,7 +158,7 @@ namespace AuctionHouse.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize (Roles = "Admin")]
-        public async Task<IActionResult> Edit(string id, [Bind("firstName,lastName,gender,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("firstName,lastName,gender,deletedByAdmin,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
         {
             if (id != user.Id)
             {
@@ -219,6 +219,57 @@ namespace AuctionHouse.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: User/DeleteByAdmin/5
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> DeleteByAdmin(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        // POST: User/DeleteByAdminConfirmed/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> DeleteByAdminConfirmed(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if ( user != null ) {
+
+                try {
+                    user.deletedByAdmin = true;
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(user.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return RedirectToAction( nameof( UserController.Index ), "User" );
+
+        }
+
         private bool UserExists(string id)
         {
             return _context.Users.Any(e => e.Id == id);
@@ -235,9 +286,22 @@ namespace AuctionHouse.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogIn ( LogInModel model ){
+            
             if ( !ModelState.IsValid ){
                 return View ( model ); 
             }
+            
+            // Provera da user slucajno nije banovan ( userDeletedByAdmin == true )
+            
+            var user = this._context.Users.Where (user => user.UserName == model.username).FirstOrDefault ( );
+
+            if ( user != null && user.deletedByAdmin == true){
+                ModelState.AddModelError ("","Your account is banned. Bjezi odnas!");
+                return View ( model );
+            }
+
+
+            // provera da li se password i username poklapaju
 
             var result = await this.signInManager.PasswordSignInAsync(model.username, model.password, false, false);
 

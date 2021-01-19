@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using AuctionHouse.Models.View;
 using AutoMapper;
@@ -15,7 +16,10 @@ namespace AuctionHouse.Models.Database{
         public string lastName {get; set; }
         [Required]
         [Display (Name = "Pol")]
-        public string gender {get; set; }  
+        public string gender {get; set; }
+        [Display (Name = "Deleted by Admin")]
+        [DefaultValue(false)]
+        public bool deletedByAdmin {get; set; }  
     }
 
     // Klasa koja mapira RegisterModel (koji dobijamo pri registraciji) u User entitet 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Factories;
 using AuctionHouse.Models.Database;
+using AuctionHouse.Models.Initializers;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -59,10 +60,12 @@ namespace AuctionHouse
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<User> userManager)
         {
             if (env.IsDevelopment())
             {
+                UserInitializer.initialize ( userManager );
+                
                 app.UseDeveloperExceptionPage();
             }
             else

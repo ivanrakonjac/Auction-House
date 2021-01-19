@@ -14,7 +14,24 @@
 }
 
 <ul class="navbar-nav">
-    <li>
-        <a class="nav-link text-dark" asp-controller="User" asp-action="Register">Register</a>
-    </li>
+
+    @if(signInManager.IsSignedIn (User) ){
+        <li>
+            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Welcome @fullName</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-controller="User" asp-action="LogOut">
+                <input type="submit" class="nav-link btn btn-link text-info" value="Log out"/>
+            </form>
+        </li>
+        
+    }else{
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="User" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="User" asp-action="LogIn">Log in</a>
+        </li>
+    }
+    
 </ul>

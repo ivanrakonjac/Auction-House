@@ -21,6 +21,7 @@ namespace AuctionHouse.Models.View{
         public string email {get;set;}
         [Required]
         [Display (Name = "Username")]
+        [StringLength(int.MaxValue, MinimumLength = 6)]
         [Remote ( controller: "User", action: nameof(UserController.isUsernameUnique) )]
         public string username {get;set;}
         [Required]

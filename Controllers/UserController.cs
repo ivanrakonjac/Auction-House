@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using AuctionHouse.Models.View;
 using AutoMapper;
 using static AuctionHouse.Models.Database.IdentityRoleConfiguration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuctionHouse.Controllers
 {
@@ -17,21 +18,25 @@ namespace AuctionHouse.Controllers
     {
         private AuctionHouseContext _context;
         private UserManager<User> userManager;
+        private SignInManager<User> signInManager;
         private IMapper mapper;
 
-        public UserController(AuctionHouseContext context, UserManager<User> userManager, IMapper mapper)
+        public UserController(AuctionHouseContext context, UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager)
         {
             _context = context;
             this.userManager = userManager;
             this.mapper = mapper;
+            this.signInManager = signInManager;
         }
 
+        [Authorize (Roles = "Admin")]
         // GET: User
         public async Task<IActionResult> Index()
         {
             return View(await _context.Users.ToListAsync());
         }
 
+        [Authorize (Roles = "Admin")]
         // GET: User/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -50,6 +55,7 @@ namespace AuctionHouse.Controllers
             return View(user);
         }
 
+        // Metoda koja sluzi za proveru emaila pri registraciji
         public IActionResult isEmailUnique( string email ){
             bool exists = this._context.Users.Where (user => user.Email == email).Any ( );
 
@@ -60,6 +66,7 @@ namespace AuctionHouse.Controllers
             }
         }
 
+        //Metoda koja sluzi za proveru usernamea pri registraciji
         public IActionResult isUsernameUnique( string username ){
             bool exists = this._context.Users.Where (user => user.UserName == username).Any ( );
 
@@ -119,10 +126,17 @@ namespace AuctionHouse.Controllers
                 return View ( registerModel );
             }
 
-            return RedirectToAction ( nameof (HomeController.Index), "Home" );
+            if(signInManager.IsSignedIn (User)){
+                return RedirectToAction ( nameof (UserController.Index), "User" );
+            }else{
+                return RedirectToAction ( nameof (UserController.LogIn), "User" );
+            }
+
+            
         }
 
         // GET: User/Edit/5
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -143,6 +157,7 @@ namespace AuctionHouse.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> Edit(string id, [Bind("firstName,lastName,gender,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
         {
             if (id != user.Id)
@@ -174,6 +189,7 @@ namespace AuctionHouse.Controllers
         }
 
         // GET: User/Delete/5
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -194,6 +210,7 @@ namespace AuctionHouse.Controllers
         // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -206,5 +223,44 @@ namespace AuctionHouse.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+        
+        public IActionResult LogIn( string returnUrl ){
+            LogInModel model = new LogInModel (){
+                returnUrl = returnUrl
+            };
+
+            return View ( model );
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogIn ( LogInModel model ){
+            if ( !ModelState.IsValid ){
+                return View ( model ); 
+            }
+
+            var result = await this.signInManager.PasswordSignInAsync(model.username, model.password, false, false);
+
+            if ( !result.Succeeded ){
+                ModelState.AddModelError ("","Username or password is not valid");
+                return View ( model );
+            }
+
+            if(model.returnUrl != null){
+                return Redirect ( model.returnUrl );
+            }
+            else{
+                return RedirectToAction ( nameof (HomeController.Index), "Home" );
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogOut(){
+            await this.signInManager.SignOutAsync ( );
+            return RedirectToAction (nameof ( HomeController.Index ), "Home");
+        }
+
+
     }
 }

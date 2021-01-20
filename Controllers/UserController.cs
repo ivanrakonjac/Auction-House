@@ -78,16 +78,35 @@ namespace AuctionHouse.Controllers
 
         }
 
+        public async Task<List<SelectListItem>> GetSelectListOfGenders ( ) {
+
+            IEnumerable<Gender> genders = await this._context.genders.ToListAsync ( );
+
+            List<SelectListItem> gendersSelectList = new List<SelectListItem> ( );
+
+            gendersSelectList.Add ( new SelectListItem { Selected = true, Text = string.Empty, Value = "-1"} );
+
+            foreach ( Gender gender in genders ) {
+                gendersSelectList.Add ( new SelectListItem { Selected = false, Text = gender.name, Value = gender.name } );
+            }
+
+            return gendersSelectList;
+        }
+
         // GET: User/Register
-        public IActionResult Register()
+        public async Task<IActionResult> RegisterAsync()
         {
-            ViewData["genders"] = new SelectList(
-                new List<SelectListItem>
-                {
-                    new SelectListItem { Selected = true, Text = string.Empty, Value = "-1"},
-                    new SelectListItem { Selected = false, Text = "Muski", Value = "muski"},
-                    new SelectListItem { Selected = false, Text = "Zenski", Value = "zenski"},
-                }, "Value" , "Text", 1);
+            IEnumerable<Gender> genders = await this._context.genders.ToListAsync ( );
+
+            List<SelectListItem> gendersSelectList = new List<SelectListItem> ( );
+
+            gendersSelectList.Add ( new SelectListItem { Selected = true, Text = string.Empty, Value = "-1"} );
+
+            foreach ( Gender gender in genders ) {
+                gendersSelectList.Add ( new SelectListItem { Selected = false, Text = gender.name, Value = gender.name } );
+            }
+
+            ViewData["genders"] = gendersSelectList;
 
             return View();
         }
@@ -149,6 +168,25 @@ namespace AuctionHouse.Controllers
             {
                 return NotFound();
             }
+
+            IEnumerable<Gender> genders = await this._context.genders.ToListAsync ( );
+
+            List<SelectListItem> gendersSelectList = new List<SelectListItem> ( );
+
+            int selectedIndex = (user.gender == "Muski" || user.gender == "muski") ? 0 : 1;
+
+            for ( int i=0 ; i < genders.Count(); i++ ) {
+               
+               bool shouldSelect = selectedIndex == i ? true : false;
+
+                gendersSelectList.Add ( 
+                    new SelectListItem {  Selected = shouldSelect, Text = genders.ElementAt(i).name, Value = genders.ElementAt(i).name } 
+                );
+            }
+
+            ViewData["genders"] = gendersSelectList;
+
+
             return View(user);
         }
 

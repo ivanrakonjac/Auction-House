@@ -8,11 +8,15 @@ namespace AuctionHouse.Models.Database {
         // Konstruktor je tu zbog dependency injectiona
         public AuctionHouseContext ( DbContextOptions<AuctionHouseContext> options ) : base (options) { }
 
+        public DbSet<Gender> genders { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
  
             builder.ApplyConfiguration ( new IdentityRoleConfiguration () );
+
+            builder.ApplyConfiguration ( new GenderConfiguration () );
         
         }
         

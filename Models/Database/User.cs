@@ -19,7 +19,8 @@ namespace AuctionHouse.Models.Database{
         public string gender {get; set; }
         [Display (Name = "Deleted by Admin")]
         [DefaultValue(false)]
-        public bool deletedByAdmin {get; set; }  
+        public bool deletedByAdmin {get; set; } 
+
     }
 
     // Klasa koja mapira RegisterModel (koji dobijamo pri registraciji) u User entitet 
@@ -33,10 +34,6 @@ namespace AuctionHouse.Models.Database{
                 .ForMember(
                     destination => destination.UserName,
                     options => options.MapFrom (data => data.username)
-                )
-                .ForMember(
-                    destination => destination.gender,
-                    options => options.MapFrom (data => data.gender)
                 )
                 .ReverseMap ( );
                 

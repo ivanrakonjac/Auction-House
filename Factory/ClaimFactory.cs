@@ -42,6 +42,10 @@ namespace AuctionHouse.Factories{
                 new Claim ( "fullName", user.firstName + " " + user.lastName )
             );
 
+            claimsIdentity.AddClaim (
+                new Claim ( "id", user.Id )
+            );
+
             IList<string> roles = await this.userManager.GetRolesAsync( user );
 
             foreach (string role in roles){

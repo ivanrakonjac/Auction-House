@@ -2,12 +2,16 @@
 @using AuctionHouse.Models.Database
 @using System.Security.Claims
 @inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
 
 @{
     string fullName = "";
+    string id = "";
     foreach (Claim claim in User.Claims){
         if(claim.Type.Equals ("fullName")){
             fullName = claim.Value;
+        }else if (claim.Type.Equals ("id")){
+            id = claim.Value;
             break;
         }
     }
@@ -16,14 +20,26 @@
 <ul class="navbar-nav">
 
     @if(signInManager.IsSignedIn (User) ){
-        <li>
-            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Welcome @fullName</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-controller="User" asp-action="LogOut">
-                <input type="submit" class="nav-link btn btn-link text-info" value="Log out"/>
-            </form>
-        </li>
+
+        <div class="dropdown show">
+            <a class="btn btn-success dropdown-toggle" 
+             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+             asp-controller="Home" asp-action="Index">
+                Welcome @fullName
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+                <form class="form-inline" asp-controller="User" asp-action="Edit" asp-route-id=@id method="GET">
+                    <input type="submit" class="nav-link btn btn-link text-info" value="Account settings"/>
+                </form>
+
+                <div class="dropdown-divider"></div>
+
+                <form class="form-inline" asp-controller="User" asp-action="LogOut">
+                    <input type="submit" class="nav-link btn btn-link text-info" value="Log out"/>
+                </form>
+            </div>
+        </div>
         
     }else{
         <li class="nav-item">

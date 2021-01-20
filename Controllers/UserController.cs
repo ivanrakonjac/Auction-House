@@ -155,7 +155,7 @@ namespace AuctionHouse.Controllers
         }
 
         // GET: User/Edit/5
-        [Authorize (Roles = "Admin")]
+        [Authorize (Roles = "Admin, User")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -195,7 +195,7 @@ namespace AuctionHouse.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize (Roles = "Admin")]
+        [Authorize (Roles = "Admin, User")]
         public async Task<IActionResult> Edit(string id, [Bind("firstName,lastName,gender,deletedByAdmin,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
         {
             if (id != user.Id)
@@ -221,7 +221,15 @@ namespace AuctionHouse.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                bool isAdmin = await this.userManager.IsInRoleAsync ( user, "Admin" );
+
+                if(isAdmin){
+                    return RedirectToAction ( nameof (UserController.Index), "User" );
+                }else{
+                    return RedirectToAction ( nameof (HomeController.Index), "Home" );
+                }
+                
             }
             return View(user);
         }
@@ -344,7 +352,7 @@ namespace AuctionHouse.Controllers
             var result = await this.signInManager.PasswordSignInAsync(model.username, model.password, false, false);
 
             if ( !result.Succeeded ){
-                ModelState.AddModelError ("","Username or password is not valid");
+                ModelState.AddModelError ("","Username or password is not valid. Zna li ti majka sto cinis?");
                 return View ( model );
             }
 

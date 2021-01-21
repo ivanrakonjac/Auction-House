@@ -21,6 +21,11 @@ namespace AuctionHouse.Models.Database{
         [DefaultValue(false)]
         public bool deletedByAdmin {get; set; } 
 
+        public ICollection<Auction> myPurchases {get; set;}
+        public ICollection<Auction> myAuctions {get; set;}
+
+        public ICollection<Bid> myBids {get; set;}
+
     }
 
     // Klasa koja mapira RegisterModel (koji dobijamo pri registraciji) u User entitet 

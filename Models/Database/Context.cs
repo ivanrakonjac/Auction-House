@@ -9,6 +9,8 @@ namespace AuctionHouse.Models.Database {
         public AuctionHouseContext ( DbContextOptions<AuctionHouseContext> options ) : base (options) { }
 
         public DbSet<Gender> genders { get; set; }
+        public DbSet<Auction> auctions {get; set;}
+        public DbSet<Bid> bids {get; set;}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -17,6 +19,10 @@ namespace AuctionHouse.Models.Database {
             builder.ApplyConfiguration ( new IdentityRoleConfiguration () );
 
             builder.ApplyConfiguration ( new GenderConfiguration () );
+         
+            builder.ApplyConfiguration(new AuctionConfiguration());
+            
+            builder.ApplyConfiguration(new BidConfiguration());
         
         }
         

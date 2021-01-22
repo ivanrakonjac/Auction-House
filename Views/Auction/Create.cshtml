@@ -4,6 +4,13 @@
     ViewData["Title"] = "Create Auction";
 }
 
+@section Scripts {
+    @{  
+        //ovo dodajem da bi se greske sklanjale u realnom vremenu
+        await Html.RenderPartialAsync ( "_ValidationScriptsPartial" ); 
+    }
+}
+
 <h1>Create</h1>
 
 <h4>Auction</h4>
@@ -24,7 +31,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="image" class="control-label"></label>
-                <input asp-for="image" class="form-control" id="image"/>
+                <img src="" width="100%" class="mb-2" id="imagePreview"/>
+                <input asp-for="image" class="form-control" id="image" type="file"/>
                 <span asp-validation-for="image" class="text-danger"></span>
             </div>
             <div class="form-group">

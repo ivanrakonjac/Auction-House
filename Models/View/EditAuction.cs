@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionHouse.Models.View {
-    public class CreateAuctionModel{
+    public class EditAuctionModel{
 
         public int Id {get;set;}
 
@@ -17,7 +17,6 @@ namespace AuctionHouse.Models.View {
         [Display(Name = "Description")]
         public string description{get; set;}
 
-        [Required]
         [Display(Name = "Image")]
         public IFormFile image{get; set;}
 
@@ -29,7 +28,7 @@ namespace AuctionHouse.Models.View {
         [Required]
         [DataType (DataType.DateTime)]
         [Display(Name = "Open Date")]
-        [Remote ( controller: "Auction", action: nameof(AuctionController.isOpenDateOk), AdditionalFields = nameof(openDate), ErrorMessage ="Open Date must be at least today." )]
+        [Remote ( controller: "Auction", action: nameof(AuctionController.isOpenDateOk), ErrorMessage ="Open Date must be at least today." )]
         public DateTime openDate{get; set;}
  
         [Required]
@@ -37,6 +36,8 @@ namespace AuctionHouse.Models.View {
         [Display(Name = "Close Date")]
         [Remote ( controller: "Auction", action: nameof(AuctionController.isCloseDateOk), AdditionalFields = nameof(openDate), ErrorMessage ="Close Date must be after Open Date." )]
         public DateTime closeDate{get; set;}
+
+        public string base64Data {get;set;}
 
     }    
 }

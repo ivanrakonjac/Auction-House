@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using AuctionHouse.Models.Database;
 using AuctionHouse.Models.View;
 using System.IO;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AuctionHouse.Controllers
 {
@@ -54,48 +53,31 @@ namespace AuctionHouse.Controllers
             return View();
         }
 
-        // Metoda za validaciju closeDatea ( closeDate mora piti posle openDatea  )
-        public bool isCloseDateOk ( DateTime openDate, DateTime closeDate){
-
-            int result = DateTime.Compare(closeDate, openDate);
-
-            if (result <= 0)
-                return false;
-            else
-                return true;
-                
-        }
-
         // POST: Auction/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateAuctionModel createAuctionModel)
+        public async Task<IActionResult> Create(CreateAuctionModel auctionModel)
         {
             if (!ModelState.IsValid)
             {
-                return View (createAuctionModel);
-            }
-
-            if( !isCloseDateOk ( createAuctionModel.openDate, createAuctionModel.closeDate ) ){
-                ModelState.AddModelError ("closeDate", "Close Date must be after Open Date");
-                return View (createAuctionModel);
+                return View (auctionModel);
             }
 
             Auction auction = new Auction ( ){
-                name = createAuctionModel.name,
-                description = createAuctionModel.description,
-                startPrice = createAuctionModel.startPrice,
-                currentPrice = createAuctionModel.startPrice,
+                name = auctionModel.name,
+                description = auctionModel.description,
+                startPrice = auctionModel.startPrice,
+                currentPrice = auctionModel.startPrice,
                 createDate = DateTime.Now,
-                openDate = createAuctionModel.openDate,
-                closeDate = createAuctionModel.closeDate,
+                openDate = auctionModel.openDate,
+                closeDate = auctionModel.closeDate,
                 state = Auction.AuctionState.DRAFT
             };
 
             
-            using ( BinaryReader reader = new BinaryReader ( createAuctionModel.image.OpenReadStream ( ) ) ) {
+            using ( BinaryReader reader = new BinaryReader ( auctionModel.image.OpenReadStream ( ) ) ) {
                 auction.image = reader.ReadBytes ( Convert.ToInt32 ( reader.BaseStream.Length ) );
             };
 
@@ -117,9 +99,18 @@ namespace AuctionHouse.Controllers
             {
                 return NotFound();
             }
-            ViewData["ownerId"] = new SelectList(_context.Users, "Id", "Id", auction.ownerId);
-            ViewData["winnerId"] = new SelectList(_context.Users, "Id", "Id", auction.winnerId);
-            return View(auction);
+            
+            EditAuctionModel editAuctionModel = new EditAuctionModel () {
+                Id = auction.Id,
+                name = auction.name,
+                description = auction.description,
+                base64Data = Convert.ToBase64String(auction.image),
+                startPrice = auction.startPrice,
+                openDate = auction.openDate,
+                closeDate = auction.closeDate
+            };
+
+            return View( editAuctionModel );
         }
 
         // POST: Auction/Edit/5
@@ -127,17 +118,39 @@ namespace AuctionHouse.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,name,description,image,startPrice,currentPrice,createDate,openDate,closeDate,state,RowVersion,ownerId,winnerId")] Auction auction)
+        public async Task<IActionResult> Edit(int id, EditAuctionModel auctionModel)
         {
+            
+            var auction = await _context.auctions.FindAsync(id);
+
             if (id != auction.Id)
             {
                 return NotFound();
+            }
+
+            if ( auction.state != Auction.AuctionState.DRAFT) {
+                ModelState.AddModelError ("", "This auction can not be edited.");
+                return View (auctionModel);
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
+
+                    auction.name = auctionModel.name;
+                    auction.description = auctionModel.description;
+                    auction.startPrice = auctionModel.startPrice;
+                    auction.currentPrice = auctionModel.startPrice;
+                    auction.openDate = auctionModel.openDate;
+                    auction.closeDate = auctionModel.closeDate;
+
+                    if ( auctionModel.image != null ) {
+                        using ( BinaryReader reader = new BinaryReader ( auctionModel.image.OpenReadStream ( ) ) ) {
+                            auction.image = reader.ReadBytes ( Convert.ToInt32 ( reader.BaseStream.Length ) );
+                        };
+                    }
+            
                     _context.Update(auction);
                     await _context.SaveChangesAsync();
                 }
@@ -154,8 +167,7 @@ namespace AuctionHouse.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ownerId"] = new SelectList(_context.Users, "Id", "Id", auction.ownerId);
-            ViewData["winnerId"] = new SelectList(_context.Users, "Id", "Id", auction.winnerId);
+            
             return View(auction);
         }
 
@@ -194,5 +206,34 @@ namespace AuctionHouse.Controllers
         {
             return _context.auctions.Any(e => e.Id == id);
         }
+
+        // Metoda za validaciju closeDatea ( closeDate mora piti posle openDatea  )
+        public bool isCloseDateOk ( DateTime openDate, DateTime closeDate){
+
+            int result = DateTime.Compare(closeDate, openDate);
+
+            if (result <= 0)
+                return false;
+            else
+                return true;
+                
+        }
+
+
+         // Metoda za validaciju openDatea ( openDate mora bar danas  )
+        public bool isOpenDateOk ( DateTime openDate){
+
+            var result = DateTime.Now - openDate;
+
+            if (result.Days == 0)
+                return true;
+            else
+                return false;
+                
+        }
+
     }
 }
+/*
+ViewData["ownerId"] = new SelectList(_context.Users, "Id", "Id", auction.ownerId);
+*/

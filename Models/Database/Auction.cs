@@ -17,37 +17,47 @@ namespace AuctionHouse.Models.Database{
         public int Id { get; set; }
 
         [Required]
+        [Display (Name = "Name")]
         public string name {get; set;}
  
         [Required]
+        [Display (Name = "Description")]
         public string description {get; set;}
  
         [Required]
+        [Display (Name = "Image")]
         public byte[] image {get; set;}
         
         [Required]
+        [Display (Name = "Start price")]
         public int startPrice {get; set;}
 
         [Required]
+        [Display (Name = "Current price")]
         public int currentPrice {get; set;}
  
         [Required]
         [DataType ( DataType.DateTime )]
+        [Display (Name = "Create Date")]
         public DateTime createDate {get; set;}
  
         [Required]
         [DataType ( DataType.DateTime )]
+        [Display (Name = "Open Date")]
         public DateTime openDate {get; set;}
  
         [Required]
         [DataType ( DataType.DateTime )]
+        [Display (Name = "Close Date")]
         public DateTime closeDate {get; set;}
  
         [Required]
         [DefaultValue(AuctionState.DRAFT)]
+        [Display (Name = "State")]
         public AuctionState state {get; set;} 
 
         [Timestamp]
+        [Display (Name = "Time Stamp")]
         public byte[] RowVersion { get; set; }
 
 

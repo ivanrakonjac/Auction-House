@@ -1,8 +1,15 @@
-@model AuctionHouse.Models.View.CreateAuctionModel
+@using System.IO
+@model AuctionHouse.Models.View.EditAuctionModel
 
 @{
     ViewData["Title"] = "Edit";
 }
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync ( "_ValidationScriptsPartial" ); }
+}
+
 
 <h1>Edit</h1>
 
@@ -10,7 +17,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -25,8 +32,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="image" class="control-label"></label>
-                <input asp-for="image" class="form-control" id="image"/>
+                <img src="data:image/png;base64,@Model.base64Data" width="100%" class="mb-2" id="imagePreview"/>
+                <input asp-for="image" class="form-control" id="image" type="file" style="display: none;"/>
                 <span asp-validation-for="image" class="text-danger"></span>
+                <button class="btn btn-secondary btn-block" type="button" id="changeImageBtn" onclick="changeDisplay()" width="100%">Zameni sliku</button>
             </div>
             <div class="form-group">
                 <label asp-for="startPrice" class="control-label"></label>

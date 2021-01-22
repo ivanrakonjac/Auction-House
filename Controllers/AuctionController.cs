@@ -54,15 +54,51 @@ namespace AuctionHouse.Controllers
             return View();
         }
 
-     
+        // Metoda za validaciju closeDatea ( closeDate mora piti posle openDatea  )
+        public bool isCloseDateOk ( DateTime openDate, DateTime closeDate){
+
+            int result = DateTime.Compare(closeDate, openDate);
+
+            if (result <= 0)
+                return false;
+            else
+                return true;
+                
+        }
 
         // POST: Auction/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Auction auction)
+        public async Task<IActionResult> Create(CreateAuctionModel createAuctionModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return View (createAuctionModel);
+            }
+
+            if( !isCloseDateOk ( createAuctionModel.openDate, createAuctionModel.closeDate ) ){
+                ModelState.AddModelError ("closeDate", "Close Date must be after Open Date");
+                return View (createAuctionModel);
+            }
+
+            Auction auction = new Auction ( ){
+                name = createAuctionModel.name,
+                description = createAuctionModel.description,
+                startPrice = createAuctionModel.startPrice,
+                currentPrice = createAuctionModel.startPrice,
+                createDate = DateTime.Now,
+                openDate = createAuctionModel.openDate,
+                closeDate = createAuctionModel.closeDate,
+                state = Auction.AuctionState.DRAFT
+            };
+
+            
+            using ( BinaryReader reader = new BinaryReader ( createAuctionModel.image.OpenReadStream ( ) ) ) {
+                auction.image = reader.ReadBytes ( Convert.ToInt32 ( reader.BaseStream.Length ) );
+            };
+
             _context.Add(auction);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

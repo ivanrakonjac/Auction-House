@@ -63,6 +63,7 @@ namespace AuctionHouse.Models.Database{
 
 
         public string ownerId {get;set;}
+        [Display (Name = "Owner")]
         public User owner {get; set;}
 
         

@@ -8,23 +8,46 @@ using Microsoft.EntityFrameworkCore;
 using AuctionHouse.Models.Database;
 using AuctionHouse.Models.View;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace AuctionHouse.Controllers
-{
+{   
+    [Authorize]
     public class AuctionController : Controller
     {
         private readonly AuctionHouseContext _context;
 
-        public AuctionController(AuctionHouseContext context)
+        private UserManager<User> _userManager;
+
+        private SignInManager<User> _signInManager;
+
+        public AuctionController(AuctionHouseContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: Auction
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var auctionHouseContext = _context.auctions.Include(a => a.owner).Include(a => a.winner);
+            var auctionHouseContext = _context.auctions.Include(a => a.owner).Include(a => a.winner).OrderByDescending ( a => a.createDate );
             return View(await auctionHouseContext.ToListAsync());
+        }
+
+        // GET: Auction/userId
+        [Authorize (Roles = "User")]
+        public async Task<IActionResult> MyAuctions(string id)
+        {
+            if (id == null){
+                id = User.FindFirst ("id").Value;
+            }
+
+            var myAuctions = _context.auctions.Where (a => a.ownerId == id).Include(a => a.owner).Include(a => a.winner);
+            return View(await myAuctions.ToListAsync());
         }
 
         // GET: Auction/Details/5
@@ -65,6 +88,9 @@ namespace AuctionHouse.Controllers
                 return View (auctionModel);
             }
 
+            // Dohvatam ID ulogovanog Usera
+            string loggedUserId = User.FindFirst ("id").Value;
+
             Auction auction = new Auction ( ){
                 name = auctionModel.name,
                 description = auctionModel.description,
@@ -73,7 +99,9 @@ namespace AuctionHouse.Controllers
                 createDate = DateTime.Now,
                 openDate = auctionModel.openDate,
                 closeDate = auctionModel.closeDate,
-                state = Auction.AuctionState.DRAFT
+                state = Auction.AuctionState.DRAFT,
+                ownerId = loggedUserId,
+                owner = await _context.Users.FirstOrDefaultAsync ( u => u.Id.Equals(loggedUserId))
             };
 
             
@@ -83,7 +111,14 @@ namespace AuctionHouse.Controllers
 
             _context.Add(auction);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            if ( User.FindFirst (ClaimTypes.Role).Value == "Admin"){
+                return RedirectToAction(nameof(Index));
+            }else{
+                return RedirectToAction(nameof(MyAuctions), "Auction");
+            }
+
+            
         }
 
         // GET: Auction/Edit/5
@@ -129,7 +164,9 @@ namespace AuctionHouse.Controllers
             }
 
             if ( auction.state != Auction.AuctionState.DRAFT) {
+                auctionModel.base64Data = Convert.ToBase64String(auction.image);
                 ModelState.AddModelError ("", "This auction can not be edited.");
+                ModelState.AddModelError ("", "Sorry!");
                 return View (auctionModel);
             }
 
@@ -165,13 +202,19 @@ namespace AuctionHouse.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                if ( User.FindFirst (ClaimTypes.Role).Value == "Admin"){
+                    return RedirectToAction(nameof(Index));
+                }else{
+                    return RedirectToAction(nameof(MyAuctions), "Auction");
+                }
             }
             
-            return View(auction);
+            return View(auctionModel);
         }
 
         // GET: Auction/Delete/5
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -194,6 +237,7 @@ namespace AuctionHouse.Controllers
         // POST: Auction/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var auction = await _context.auctions.FindAsync(id);
@@ -227,9 +271,76 @@ namespace AuctionHouse.Controllers
 
             if (result.Days == 0)
                 return true;
+            
+            int res = DateTime.Compare(openDate, DateTime.Now);
+
+            if (res >= 0)
+                return true;
             else
                 return false;
                 
+        }
+
+        // POST: Auction/Approve/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> Approve(int id)
+        {
+            
+            var auction = await _context.auctions.FindAsync(id);
+
+            try
+            {
+                auction.state = Auction.AuctionState.READY;
+
+                _context.Update(auction);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AuctionExists(auction.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Auction/SetStateToDeleted/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> SetStateToDeleted(int id)
+        {
+            
+            var auction = await _context.auctions.FindAsync(id);
+
+            try
+            {
+                auction.state = Auction.AuctionState.DELETED;
+
+                _context.Update(auction);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AuctionExists(auction.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
     }

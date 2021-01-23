@@ -1,7 +1,11 @@
 @model AuctionHouse.Models.Database.Auction
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Auction";
+}
+
+@{
+   string base64Data = Convert.ToBase64String(@Model.image);
 }
 
 <h1>Delete</h1>
@@ -27,19 +31,25 @@
             @Html.DisplayNameFor(model => model.image)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.image)
+            
+        </dd>
+        <dt class = "col-sm-4">
+            <img src="data:image/png;base64,@base64Data" width="100%" class="mb-2 mt-2"/>
+        </dt>
+        <dd class = "col-sm-8">
+            
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.startPrice)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.startPrice)
+            @Html.DisplayFor(model => model.startPrice) $
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.currentPrice)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.currentPrice)
+            @Html.DisplayFor(model => model.currentPrice) $
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.createDate)
@@ -66,26 +76,20 @@
             @Html.DisplayFor(model => model.state)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RowVersion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RowVersion)
-        </dd>
-        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.owner)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.owner.Id)
-        </dd class>
+            @Html.DisplayFor(model => model.owner.UserName)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.winner)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.winner.Id)
-        </dd class>
+        </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form asp-action="SetStateToDeleted">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>

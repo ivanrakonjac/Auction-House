@@ -1,8 +1,29 @@
+@using System.IO
+@using System.Security.Claims
 @model AuctionHouse.Models.Database.Auction
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Auction Details";
 }
+
+@{
+    string id = "";
+    var role = "";
+    foreach (Claim claim in User.Claims){
+        if (claim.Type.Equals ("id")){
+            id = claim.Value;
+        }else if (claim.Type.Equals (ClaimTypes.Role) ) {
+            role = claim.Value;
+            break;
+        }
+    }
+}
+
+@{
+   string base64Data = Convert.ToBase64String(@Model.image);
+}
+
+
 
 <h1>Details</h1>
 
@@ -26,19 +47,25 @@
             @Html.DisplayNameFor(model => model.image)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.image)
+            
+        </dd>
+        <dt class = "col-sm-4">
+            <img src="data:image/png;base64,@base64Data" width="100%" class="mb-2 mt-2"/>
+        </dt>
+        <dd class = "col-sm-8">
+            
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.startPrice)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.startPrice)
+            @Html.DisplayFor(model => model.startPrice) $
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.currentPrice)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.currentPrice)
+            @Html.DisplayFor(model => model.currentPrice) $
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.createDate)
@@ -65,16 +92,10 @@
             @Html.DisplayFor(model => model.state)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RowVersion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RowVersion)
-        </dd>
-        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.owner)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.owner.Id)
+            @Html.DisplayFor(model => model.owner.UserName)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.winner)
@@ -85,6 +106,11 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if ( role == "User" ) {
+        <a asp-action="Edit" asp-route-id=@Model.Id>Edit | </a>
+        <a asp-action="MyAuctions" asp-route-id=@id>Back to List</a>
+    }else{
+        <a asp-action="Index">Back to List</a>
+    }
+    
 </div>

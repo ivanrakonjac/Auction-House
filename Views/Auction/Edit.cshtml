@@ -1,8 +1,25 @@
 @using System.IO
+@using System.Security.Claims
 @model AuctionHouse.Models.View.EditAuctionModel
 
 @{
     ViewData["Title"] = "Edit";
+}
+
+@{
+    string id = "";
+    foreach (Claim claim in User.Claims){
+        if (claim.Type.Equals ("id")){
+            id = claim.Value;
+            break;
+        }
+    }
+}
+
+@{
+    if (@Model.base64Data == null) {
+
+    }
 }
 
 
@@ -39,7 +56,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="startPrice" class="control-label"></label>
-                <input asp-for="startPrice" class="form-control" />
+                <div class="input-group-prepend">
+                    <input asp-for="startPrice" class="form-control" />
+                    <div class="input-group-text">$</div>
+                </div>
                 <span asp-validation-for="startPrice" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -60,6 +80,6 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="MyAuctions" asp-route-id=@id>Back to List</a>
 </div>
 

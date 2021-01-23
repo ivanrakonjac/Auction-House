@@ -7,11 +7,14 @@
 @{
     string fullName = "";
     string id = "";
+    var role = "";
     foreach (Claim claim in User.Claims){
         if(claim.Type.Equals ("fullName")){
             fullName = claim.Value;
         }else if (claim.Type.Equals ("id")){
             id = claim.Value;
+        }else if (claim.Type.Equals (ClaimTypes.Role) ) {
+            role = claim.Value;
             break;
         }
     }
@@ -32,6 +35,12 @@
                 <form class="form-inline" asp-controller="User" asp-action="Edit" asp-route-id=@id method="GET">
                     <input type="submit" class="nav-link btn btn-link text-info" value="Account settings"/>
                 </form>
+
+                @if ( role == "User" ) {
+                <form class="form-inline" asp-controller="Auction" asp-action="MyAuctions" asp-route-id=@id method="GET">
+                    <input type="submit" class="nav-link btn btn-link text-info" value="My auctions"/>
+                </form>
+                }
 
                 <div class="dropdown-divider"></div>
 

@@ -1,8 +1,26 @@
-@model AuctionHouse.Models.View.SearchedAuctionsModel;
+@model AuctionHouse.Models.View.PaginatedList<AuctionHouse.Models.Database.Auction>
 
 @{
-    if(@Model != null && @Model.auctions!= null ){
-        @foreach (var item in Model.auctions) {
+    ViewData["Title"] = "Index";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Ime
+            </th>
+            <th>
+                Cena
+            </th>
+            <th>
+                Datum
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.name)
@@ -15,6 +33,30 @@
                 </td>
             </tr>
         }
-    }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
+<!--
+
+<a asp-action="Search"
+   asp-controller="Auction"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Search"
+    asp-controller="Auction"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a> -->
+ 
+<input type="button" value="Nazad" class="btn btn-default" onclick="getSearchedAuctionsPages(@(Model.PageIndex - 1))" @prevDisabled/> |
+<input type="button" value="Napred" class="btn btn-default @nextDisabled" onclick="getSearchedAuctionsPages(@(Model.PageIndex + 1))" @nextDisabled/> |

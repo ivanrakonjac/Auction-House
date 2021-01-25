@@ -25,20 +25,33 @@ function readURL(input) {
   });
 
 
-function getSearchedAuctionsGET ( ) {
+
+function getSearchedAuctionsPages ( pageNumber ) {
 
   var searchString = $("#searchString").val ();
+  var minPrice = $("#minPrice").val ();
+  var maxPrice = $("#maxPrice").val ();
+  var status = $("#selectedState").val ();
 
   $.ajax ( {
     type: "GET",
-    url: "/Auction/Search?searchString=" + searchString,
+    url: "/Auction/Search?searchString=" + searchString + "&minPrice=" + minPrice + 
+    "&maxPrice=" + maxPrice + "&status=" + status + "&pageNumber=" + pageNumber,
     dataType: "text",
     success: function ( response ){
-      $("#pokusaj").html (response);
+      $("#searchedResult").html (response);
     },
     error: function ( response ){
-        alert ( response );
+        alert ( "response" );
     }
 })
 
 }
+
+// Fukncija koja hvata enter u search boxu
+$(".reagujNaEnter").on('keyup', function (e) {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+      console.log ("ENTER");
+      getSearchedAuctionsPages();
+  }
+});

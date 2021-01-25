@@ -344,22 +344,67 @@ namespace AuctionHouse.Controllers
         }
 
         // GET: Searched Auctions
-        public async Task<IActionResult> Search ( string searchString )
+        [AllowAnonymous]
+        public async Task<IActionResult> Search ( string searchString, string minPrice, string maxPrice, string status, int? pageNumber )
         {
+            ViewData["CurrentFilter"] = searchString;
+            int pageSize = 2;
+
             var auctions = from a in _context.auctions select a;
+
+            if (pageNumber == null || pageNumber == 0)
+            {
+                pageNumber = 1;
+            }
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                ViewData["CurrentFilter"] = searchString;
                 auctions = auctions.Where(a => a.name.Contains(searchString) || a.description.Contains(searchString));
             }
+
+            if (!String.IsNullOrEmpty(minPrice))
+            {
+                auctions = auctions.Where(a => a.currentPrice >= Int32.Parse(minPrice));
+            }
+
+            if (!String.IsNullOrEmpty(maxPrice))
+            {
+                auctions = auctions.Where(a => a.currentPrice <= Int32.Parse(maxPrice));
+            }
+
+            if (!String.IsNullOrEmpty(status))
+            {
+                if( status == "open" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.OPEN);
+                }
+                else if( status == "sold" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.SOLD);
+                }
+                else if( status == "expired" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.EXPIRED);
+                }
+                else if( status == "draft" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.DRAFT);
+                }
+                else if( status == "deleted" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.DELETED);
+                }
+                else if( status == "ready" ){
+                    auctions = auctions.Where(a => a.state == Auction.AuctionState.READY);
+                }
+                
+
+            }
+
+            auctions = auctions.OrderByDescending (a => a.createDate);
 
             SearchedAuctionsModel searchedAuctionsModel = new SearchedAuctionsModel () {
                 auctions = await auctions.AsNoTracking().ToListAsync()
             };
 
-            return PartialView ( "SearchedAuctions", searchedAuctionsModel );
-            //return Json (true);
+            
+            return PartialView("SearchedAuctions", await PaginatedList<Auction>.CreateAsync(auctions.AsNoTracking(), pageNumber ?? 1, pageSize));
+
         }
 
     }

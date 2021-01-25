@@ -1,25 +1,71 @@
-﻿@model AuctionHouse.Models.View.SearchedAuctionsModel
+﻿@using System.Security.Claims
+@model AuctionHouse.Models.View.SearchedAuctionsModel
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
+@{
+    var role = "";
+    foreach (Claim claim in User.Claims){
+        if (claim.Type.Equals (ClaimTypes.Role) ) {
+            role = claim.Value;
+            break;
+        }
+    }
+}
+
+<div class="text-center mb-5">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>Find or post your auction!</p>
 </div>
 
 
-<form >
-    <div class="form-actions no-color">
-        <p>
-            Find by name: <input type="text" name="SearchString" id="searchString" />
-            <input type="button" value="Search" class="btn btn-default" onclick="getSearchedAuctionsGET()"/> |
-            <a asp-action="Index">Back to Full List</a>
-        </p>
-    </div>
-</form>
+    
 
-<table id="pokusaj">
+   <div class="form-group">
+    <input type="text" class="reagujNaEnter form-control" id="searchString" placeholder="">
+  </div>
+
+  <div class="row">
+    <div class="col mr-1">
+        <div class="input-group-prepend">
+            <input type="text" class="reagujNaEnter form-control" id="minPrice" placeholder="Min price">
+            <div class="input-group-text">$</div>
+        </div>
+    </div>
+    <div class="col ml-1 mr-1">
+        <div class="input-group-prepend">
+          <input type="text" class="reagujNaEnter form-control" id="maxPrice" placeholder="Max price">
+          <div class="input-group-text">$</div>
+        </div>
+    </div>
+    <div class="col ml-1">
+      <select class="reagujNaEnter form-control" id="selectedState" placeholder="Last name">
+        <option value="-1" active>Choose state</option>
+        <option value="open">OPEN</option>
+        <option value="sold">SOLD</option>
+        <option value="expired">EXPIRED</option>
+
+        @{
+            @if ( role == "Admin" ) {
+                <option value="draft">DRAFT</option>
+                <option value="deleted">DELETED</option>
+                <option value="ready">READY</option>
+            }
+        }
+
+      </select>
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-block mt-3" onclick="getSearchedAuctionsPages()"><b>SEARCH</b></button>
+
+    
+
+
+
+<table id="searchedResult">
 
 </table>
+

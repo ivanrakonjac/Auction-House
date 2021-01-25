@@ -23,3 +23,22 @@ function readURL(input) {
   $("#image").change(function() {
     readURL(this);
   });
+
+
+function getSearchedAuctionsGET ( ) {
+
+  var searchString = $("#searchString").val ();
+
+  $.ajax ( {
+    type: "GET",
+    url: "/Auction/Search?searchString=" + searchString,
+    dataType: "text",
+    success: function ( response ){
+      $("#pokusaj").html (response);
+    },
+    error: function ( response ){
+        alert ( response );
+    }
+})
+
+}

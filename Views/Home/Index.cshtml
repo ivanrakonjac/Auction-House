@@ -1,4 +1,6 @@
-﻿@{
+﻿@model AuctionHouse.Models.View.SearchedAuctionsModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -6,3 +8,18 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+
+<form >
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="SearchString" id="searchString" />
+            <input type="button" value="Search" class="btn btn-default" onclick="getSearchedAuctionsGET()"/> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<table id="pokusaj">
+
+</table>

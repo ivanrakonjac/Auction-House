@@ -1,0 +1,20 @@
+@model AuctionHouse.Models.View.SearchedAuctionsModel;
+
+@{
+    if(@Model != null && @Model.auctions!= null ){
+        @foreach (var item in Model.auctions) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.currentPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.closeDate)
+                </td>
+            </tr>
+        }
+    }
+}
+

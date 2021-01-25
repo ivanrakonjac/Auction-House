@@ -343,6 +343,25 @@ namespace AuctionHouse.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Searched Auctions
+        public async Task<IActionResult> Search ( string searchString )
+        {
+            var auctions = from a in _context.auctions select a;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                ViewData["CurrentFilter"] = searchString;
+                auctions = auctions.Where(a => a.name.Contains(searchString) || a.description.Contains(searchString));
+            }
+
+            SearchedAuctionsModel searchedAuctionsModel = new SearchedAuctionsModel () {
+                auctions = await auctions.AsNoTracking().ToListAsync()
+            };
+
+            return PartialView ( "SearchedAuctions", searchedAuctionsModel );
+            //return Json (true);
+        }
+
     }
 }
 /*

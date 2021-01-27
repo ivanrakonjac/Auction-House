@@ -348,7 +348,7 @@ namespace AuctionHouse.Controllers
         public async Task<IActionResult> Search ( string searchString, string minPrice, string maxPrice, string status, int? pageNumber )
         {
             ViewData["CurrentFilter"] = searchString;
-            int pageSize = 2;
+            int pageSize = 6;
 
             var auctions = from a in _context.auctions select a;
 

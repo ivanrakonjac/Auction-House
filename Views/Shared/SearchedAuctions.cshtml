@@ -4,45 +4,66 @@
     ViewData["Title"] = "Index";
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Ime
-            </th>
-            <th>
-                Cena
-            </th>
-            <th>
-                Datum
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.currentPrice)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.closeDate)
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@{
+    var brojac = 0;
+}
+
+@foreach (var item in Model)
+{
+    
+    string pathSlike = Convert.ToBase64String(item.image);
+
+    <div class="col-lg-4 mb-3 card">
+
+        <img src="data:image/png;base64,@pathSlike" width="100%"/>
+        
+        <div class="card-body text-center ">
+
+            <h3 class="card-title mb-3"><b>@Html.DisplayFor(modelItem => item.name)</b></h3>
+
+            <div id="timeToEndDiv_@brojac">
+
+                <img src="~/images/clock.png" width="32px" height="32px"/>
+
+                <span class="card-text" id="dani_@brojac"></span>
+                <span class="card-text" id="sati_@brojac"></span>
+                <span class="card-text" id="minuti_@brojac"></span>
+                <span class="card-text" id="sekunde_@brojac"></span>
+
+            </div>
+            
+            <h4 class="card-text mt-2 mb-4">Cena: @item.currentPrice $</h4>
+
+            <button class="btn btn-primary btn-lg" id="bidButton_@brojac">BID</button>
+            
+        </div>
+        <div class="card-footer">
+            <img src="~/images/ponude.png" width="32px" height="32px"/>
+            <small class="text-muted"> 9 ponuda, last updated 3 mins ago</small>
+        </div>
+        <a href="#" class="btn btn-success btn-block mt-3 mb-3">VIDI DETALJE</a>
+
+        <input type="hidden" id="godinaCloseDate_@brojac" value="@item.closeDate.Year">
+        <input type="hidden" id="mesecCloseDate_@brojac" value="@item.closeDate.Month">
+        <input type="hidden" id="danCloseDate_@brojac" value="@item.closeDate.Day">
+        <input type="hidden" id="satCloseDate_@brojac" value="@item.closeDate.Hour">
+        <input type="hidden" id="minutCloseDate_@brojac" value="@item.closeDate.Minute">
+        <input type="hidden" id="sekundCloseDate_@brojac" value="@item.closeDate.Second">
+
+    </div>
+
+  brojac++;
+}
+
 
 @{
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<!--
 
+
+<!--
 <a asp-action="Search"
    asp-controller="Auction"
    asp-route-pageNumber="@(Model.PageIndex - 1)"
@@ -57,6 +78,7 @@
    class="btn btn-default @nextDisabled">
     Next
 </a> -->
- 
-<input type="button" value="Nazad" class="btn btn-default" onclick="getSearchedAuctionsPages(@(Model.PageIndex - 1))" @prevDisabled/> |
-<input type="button" value="Napred" class="btn btn-default @nextDisabled" onclick="getSearchedAuctionsPages(@(Model.PageIndex + 1))" @nextDisabled/> |
+<div class="col-sm-12 text-center">
+    <input type="button" value="Nazad" class="btn btn-default" onclick="getSearchedAuctionsPages(@(Model.PageIndex - 1))" @prevDisabled/> |
+    <input type="button" value="Napred" class="btn btn-default @nextDisabled" onclick="getSearchedAuctionsPages(@(Model.PageIndex + 1))" @nextDisabled/> |
+</div>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuctionHouse.Factories;
+using AuctionHouse.Hubs;
 using AuctionHouse.Models.Database;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
@@ -56,6 +57,8 @@ namespace AuctionHouse
             services.AddScoped<IUserClaimsPrincipalFactory<User>, ClaimFactory> ( );
 
             services.AddControllersWithViews();
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,6 +85,7 @@ namespace AuctionHouse
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<AuctionHub> ( "/update" );
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

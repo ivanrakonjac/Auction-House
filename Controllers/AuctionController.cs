@@ -148,6 +148,63 @@ namespace AuctionHouse.Controllers
             return View( editAuctionModel );
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> Bid(int? id, byte[] rowVersion)
+        {
+
+            if (id == null)
+            {
+                return Json (false);
+            }
+
+            var auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
+
+            if (auctionToUpdate == null)
+            {
+                return Json (false);
+            }
+
+            _context.Entry(auctionToUpdate).Property("RowVersion").OriginalValue = rowVersion;
+
+            if (await TryUpdateModelAsync<Auction>(auctionToUpdate, "", a => a.currentPrice)){
+                try{
+                    auctionToUpdate.currentPrice += 100;
+                    await _context.SaveChangesAsync();
+
+                    auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
+
+                    Auction resultAuction = new Auction () {
+                        currentPrice = auctionToUpdate.currentPrice,
+                        RowVersion = auctionToUpdate.RowVersion
+                    };
+
+                    return Json(resultAuction);
+                }
+                catch (DbUpdateConcurrencyException ex) {
+                    return Json (false);
+                }
+            }
+
+
+            return Json(false);
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> getAuctionUpdateData(int? id)
+        {
+            var auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
+
+            Auction resultAuction = new Auction () {
+                currentPrice = auctionToUpdate.currentPrice,
+                RowVersion = auctionToUpdate.RowVersion
+            };
+
+            return Json(resultAuction);
+        }
+
         // POST: Auction/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.

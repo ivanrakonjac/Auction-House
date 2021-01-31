@@ -3,6 +3,15 @@
 
 // Write your JavaScript code.
 
+// Pravljenje objekta konekcije za slanje poruka serveru i za primanje notifikacija
+var connection = new signalR.HubConnectionBuilder ( ).withUrl ( "/update" ).build ( );
+connection.start ( );
+
+function handleError ( error ) {
+    alert ( error );
+}
+
+/* Fukncije koje se koriste da se odmah vidi slika po odabiru, a da ne ode u bazu */
 function changeDisplay () {
     $("#image").css ( "display", "inline" ) ;
     $("#changeImageBtn").css ( "display", "none" ) ;
@@ -23,7 +32,7 @@ function readURL(input) {
   $("#image").change(function() {
     readURL(this);
   });
-
+/* Fukncije koje se koriste da se odmah vidi slika po odabiru, a da ne ode u bazu -- KRAJ*/
 
 
 function getSearchedAuctionsPages ( pageNumber ) {
@@ -135,3 +144,74 @@ function updateTimeToEndOfAuction ( ) {
 }
 
 setInterval ( updateTimeToEndOfAuction, 1000 );
+
+/**
+ * fukncija koja se poziva kada user pritisne BID na kartici proizvoda
+ * id - id kartice od 1 do 12
+ * auctionID - id aukcije u bazi
+*/
+function bid ( id, auctionID ) {
+  var rowVersion = $("#RowVersion_" + id ).val ( );
+  var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
+
+  $.ajax ( {
+      type: "POST",
+      dataType: "json",
+      url: "/Auction/Bid",
+      data: {
+          "id" : auctionID,
+          "rowVersion" : rowVersion,
+          "__RequestVerificationToken" : verificationToken
+      },
+      success: function ( response ){
+        console.log (response.rowVersion); 
+        console.log (response.currentPrice); 
+
+        $("#RowVersion_" + id ).val ( response.rowVersion );
+        $("#currentPrice_" + id ).text ( "Cena: " +  response.currentPrice + " $" );
+        
+        connection.invoke ("NotifyUsers", id, auctionID);
+
+      },
+      error: function ( response ){
+          alert ( response );
+      }
+  })
+}
+
+//setInterval ( bid, 10000, 0, 5 );
+
+connection.on (
+  "UpdateAuction",
+  /**
+   * funkcija koja se poziva pri promeni cene aukcije sa auctionID-jem na kartici sa id-jem
+   * 
+   * @param {int} id - id kartice proizvoda
+   * @param {int} auctionID - id aukcije u bazi
+   */
+  function (id, auctionID ) {
+
+    var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
+
+    $.ajax ( {
+      type: "POST",
+      dataType: "json",
+      url: "/Auction/getAuctionUpdateData",
+      data: {
+          "id" : auctionID,
+          "__RequestVerificationToken" : verificationToken
+      },
+      success: function ( response ){
+        console.log (response.rowVersion); 
+        console.log (response.currentPrice); 
+
+        $("#RowVersion_" + id ).val ( response.rowVersion );
+        $("#currentPrice_" + id ).text ( "Cena: " +  response.currentPrice + " $" );
+
+      },
+      error: function ( response ){
+          alert ( response );
+      }
+    })
+  }
+);

@@ -1,7 +1,18 @@
+@using System.Security.Claims
 @model IEnumerable<AuctionHouse.Models.Database.Auction>
 
 @{
     ViewData["Title"] = "My Auctions";
+}
+
+@{
+    var role = "";
+    foreach (Claim claim in User.Claims){
+        if (claim.Type.Equals (ClaimTypes.Role) ) {
+            role = claim.Value;
+            break;
+        }
+    }
 }
 
 <h1>Index</h1>
@@ -48,7 +59,7 @@
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a>
             </td>
 
-            @if (@item.state == AuctionHouse.Models.Database.Auction.AuctionState.DRAFT){
+            @if ( @item.state == AuctionHouse.Models.Database.Auction.AuctionState.DRAFT && role == "Admin" ){
                 <td>
                     <form asp-action="Approve" asp-route-id="@item.Id" method="post">
                         <input type="submit" value="Approve  " class="btn btn-primary" />
@@ -60,10 +71,16 @@
                             <input type="submit" value="Deleted   " class="btn btn-danger" disabled/>
                         </form>
                     </td>
-            }else{
+            }else if ( @item.state == AuctionHouse.Models.Database.Auction.AuctionState.READY || @item.state == AuctionHouse.Models.Database.Auction.AuctionState.OPEN ) {
                 <td>
                     <form>
                         <input type="submit" value="Approved" class="btn btn-success" disabled/>
+                    </form>
+                </td>
+            }else {
+                <td>
+                    <form>
+                        <input type="submit" value="" class="btn" disabled/>
                     </form>
                 </td>
             }

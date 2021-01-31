@@ -6,6 +6,11 @@
 }
 
 @{
+    // Za dodavanje signalR skripti, da JS ne bi javljao gresku
+    await Html.RenderPartialAsync ( "SignalRScriptsPartial" );
+}
+
+@{
     var role = "";
     foreach (Claim claim in User.Claims){
         if (claim.Type.Equals (ClaimTypes.Role) ) {

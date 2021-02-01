@@ -23,6 +23,8 @@ namespace AuctionHouse.Controllers
 
         private SignInManager<User> _signInManager;
 
+        private int incCurrentPrice = 100;
+
         public AuctionController(AuctionHouseContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _context = context;
@@ -148,6 +150,9 @@ namespace AuctionHouse.Controllers
             return View( editAuctionModel );
         }
 
+        
+        // POST: Auction/Bid
+        // Fukncija koja se poziva na click BID dugmeta 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> Bid(int? id, byte[] rowVersion)
@@ -169,20 +174,40 @@ namespace AuctionHouse.Controllers
 
             if (await TryUpdateModelAsync<Auction>(auctionToUpdate, "", a => a.currentPrice)){
                 try{
-                    auctionToUpdate.currentPrice += 100;
+
+                    User loggedUser = await this._userManager.GetUserAsync(base.User);
+
+                    auctionToUpdate.currentPrice += incCurrentPrice;
+                    auctionToUpdate.winner = loggedUser;
+                    auctionToUpdate.winnerId = loggedUser.Id;
+
+                    Bid bid = new Bid () {
+                        price = auctionToUpdate.currentPrice,
+                        bidDate = DateTime.Now,
+                        user = loggedUser,
+                        userId = loggedUser.Id,
+                        auctionId = auctionToUpdate.Id
+                    };
+
+                    _context.Add(bid);
+
                     await _context.SaveChangesAsync();
 
-                    auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
+                    auctionToUpdate = await _context.auctions.Include(a => a.winner).FirstOrDefaultAsync(a => a.Id == id);
 
-                    Auction resultAuction = new Auction () {
+                    var bids = await _context.bids.Where(b => b.auctionId == auctionToUpdate.Id).ToListAsync();
+
+                    UpdatedAuction resultAuction = new UpdatedAuction () {
                         currentPrice = auctionToUpdate.currentPrice,
-                        RowVersion = auctionToUpdate.RowVersion
+                        RowVersion = auctionToUpdate.RowVersion,
+                        winnerUsername = auctionToUpdate.winner.UserName,
+                        numberOfBids = bids.Count
                     };
 
                     return Json(resultAuction);
                 }
                 catch (DbUpdateConcurrencyException ex) {
-                    return Json (false);
+                    return Json (ex);
                 }
             }
 
@@ -195,12 +220,17 @@ namespace AuctionHouse.Controllers
         [AllowAnonymous]
         public async Task<JsonResult> getAuctionUpdateData(int? id)
         {
-            var auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
+            var auctionToUpdate = await _context.auctions.Include(a => a.winner).FirstOrDefaultAsync(a => a.Id == id);
 
-            Auction resultAuction = new Auction () {
+            var bids = await _context.bids.Where(b => b.auctionId == auctionToUpdate.Id).ToListAsync();
+
+            UpdatedAuction resultAuction = new UpdatedAuction () {
                 currentPrice = auctionToUpdate.currentPrice,
-                RowVersion = auctionToUpdate.RowVersion
+                RowVersion = auctionToUpdate.RowVersion,
+                winnerUsername = auctionToUpdate.winner.UserName,
+                numberOfBids = bids.Count
             };
+
 
             return Json(resultAuction);
         }
@@ -454,6 +484,7 @@ namespace AuctionHouse.Controllers
             }
 
             auctions = auctions.OrderByDescending (a => a.createDate);
+            
 
             SearchedAuctionsModel searchedAuctionsModel = new SearchedAuctionsModel () {
                 auctions = await auctions.AsNoTracking().ToListAsync()

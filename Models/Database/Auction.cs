@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -71,6 +72,9 @@ namespace AuctionHouse.Models.Database{
         public User winner {get; set;} 
 
         public ICollection<Bid> bids {get; set;}
+
+        [NotMapped]
+        public int numberOfBids { get; set; }
 
     }
 

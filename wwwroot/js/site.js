@@ -172,6 +172,7 @@ function bid ( auctionID ) {
 
         $("#RowVersion_" + auctionID ).val ( response.rowVersion );
         $("#currentPrice_" + auctionID ).text ( "Cena: " +  response.currentPrice + " $" );
+        $("#lastBid_" + auctionID ).text ( response.numberOfBids + " bids, last bid by " +  response.winnerUsername );
         
         connection.invoke ("NotifyUsers", auctionID);
 
@@ -209,6 +210,7 @@ connection.on (
 
         $("#RowVersion_" + auctionID ).val ( response.rowVersion );
         $("#currentPrice_" + auctionID ).text ( "Cena: " +  response.currentPrice + " $" );
+        $("#lastBid_" + auctionID ).text ( response.numberOfBids + " bids, last bid by " +  response.winnerUsername );
 
       },
       error: function ( response ){

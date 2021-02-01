@@ -192,7 +192,7 @@ namespace AuctionHouse.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<JsonResult> getAuctionUpdateData(int? id)
         {
             var auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);

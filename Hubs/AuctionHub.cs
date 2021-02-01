@@ -5,9 +5,9 @@ namespace AuctionHouse.Hubs
 {
     public class AuctionHub : Hub
     {
-        public async Task NotifyUsers(int? carId, int? auctionId)
+        public async Task NotifyUsers(int auctionId)
         {
-            await Clients.All.SendAsync("UpdateAuction", carId, auctionId);
+            await Clients.All.SendAsync("UpdateAuction", auctionId);
         }
     }
 }

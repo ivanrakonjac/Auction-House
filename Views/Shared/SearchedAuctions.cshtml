@@ -21,20 +21,20 @@
 
             <h3 class="card-title mb-3"><b>@Html.DisplayFor(modelItem => item.name)</b></h3>
 
-            <div id="timeToEndDiv_@brojac">
+            <div id="timeToEndDiv_@item.Id">
 
                 <img src="~/images/clock.png" width="32px" height="32px"/>
 
-                <span class="card-text" id="dani_@brojac"></span>
-                <span class="card-text" id="sati_@brojac"></span>
-                <span class="card-text" id="minuti_@brojac"></span>
-                <span class="card-text" id="sekunde_@brojac"></span>
+                <span class="card-text" id="dani_@item.Id"></span>
+                <span class="card-text" id="sati_@item.Id"></span>
+                <span class="card-text" id="minuti_@item.Id"></span>
+                <span class="card-text" id="sekunde_@item.Id"></span>
 
             </div>
             
-            <h4 class="card-text mt-2 mb-4" id="currentPrice_@brojac">Cena: @item.currentPrice $</h4>
+            <h4 class="card-text mt-2 mb-4" id="currentPrice_@item.Id">Cena: @item.currentPrice $</h4>
 
-            <button class="btn btn-primary btn-lg" id="bidButton_@brojac" onclick="bid(@brojac, @item.Id)">BID</button>
+            <button class="btn btn-primary btn-lg" id="bidButton_@item.Id" onclick="bid(@item.Id, @item.Id)">BID</button>
             
         </div>
         <div class="card-footer">
@@ -43,14 +43,15 @@
         </div>
         <a href="#" class="btn btn-success btn-block mt-3 mb-3">VIDI DETALJE</a>
 
-        <input type="hidden" id="RowVersion_@brojac" asp-for="@item.RowVersion" />
+        <input type="hidden" class="auctionId" asp-for="@item.Id" />
+        <input type="hidden" id="RowVersion_@item.Id" asp-for="@item.RowVersion" />
 
-        <input type="hidden" id="godinaCloseDate_@brojac" value="@item.closeDate.Year">
-        <input type="hidden" id="mesecCloseDate_@brojac" value="@item.closeDate.Month">
-        <input type="hidden" id="danCloseDate_@brojac" value="@item.closeDate.Day">
-        <input type="hidden" id="satCloseDate_@brojac" value="@item.closeDate.Hour">
-        <input type="hidden" id="minutCloseDate_@brojac" value="@item.closeDate.Minute">
-        <input type="hidden" id="sekundCloseDate_@brojac" value="@item.closeDate.Second">
+        <input type="hidden" id="godinaCloseDate_@item.Id" value="@item.closeDate.Year">
+        <input type="hidden" id="mesecCloseDate_@item.Id" value="@item.closeDate.Month">
+        <input type="hidden" id="danCloseDate_@item.Id" value="@item.closeDate.Day">
+        <input type="hidden" id="satCloseDate_@item.Id" value="@item.closeDate.Hour">
+        <input type="hidden" id="minutCloseDate_@item.Id" value="@item.closeDate.Minute">
+        <input type="hidden" id="sekundCloseDate_@item.Id" value="@item.closeDate.Second">
 
     </div>
 

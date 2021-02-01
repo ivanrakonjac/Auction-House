@@ -66,10 +66,10 @@ $(".reagujNaEnter").on('keyup', function (e) {
 });
 
 
-/*
-* Funkcija koja updeateuje vreme do kraja aukcije
-* Prosledjuje se id kartice aukcije
-*/
+/**
+ * Funkcija koja updeateuje vreme do kraja aukcije
+ * @param {int} id - auctionId u bazi 
+ */
 function getTimeToEndOfAuction ( id ){
 
   var one_day = 1000*60*60*24;
@@ -133,25 +133,28 @@ function getTimeToEndOfAuction ( id ){
 
 }
 
-/*
-* Funkcija koja poziva update vremena do kraja aukcije
-* za svih 12 karica koliko ih ima na Indexu
-*/
+/**
+ * Funkcija koja poziva fju getTimeToEndOfAuction za sve karitce
+ */
 function updateTimeToEndOfAuction ( ) {
-  for (let index = 0; index < 12; index++) {
-    getTimeToEndOfAuction ( index );
-  }
+  //Dohvatim sve elemente sa classom .auctionId i iz njih izvucem index aukcije u bazi (hidden filed)
+  //Onda pozivam getTimeToEndOfAuction(auctionId)
+  $('.auctionId').each(function(i, obj) {
+    var index = i;
+    var auctionId = $(this).val ( );
+    getTimeToEndOfAuction ( auctionId );
+  });
 }
 
 setInterval ( updateTimeToEndOfAuction, 1000 );
 
+
 /**
- * fukncija koja se poziva kada user pritisne BID na kartici proizvoda
- * id - id kartice od 1 do 12
- * auctionID - id aukcije u bazi
-*/
-function bid ( id, auctionID ) {
-  var rowVersion = $("#RowVersion_" + id ).val ( );
+ * Fukncija koja se poziva kada user pritisne BID na kartici proizvoda
+ * @param {int} auctionID - id aukcije u bazi
+ */
+function bid ( auctionID ) {
+  var rowVersion = $("#RowVersion_" + auctionID ).val ( );
   var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
 
   $.ajax ( {
@@ -167,10 +170,10 @@ function bid ( id, auctionID ) {
         console.log (response.rowVersion); 
         console.log (response.currentPrice); 
 
-        $("#RowVersion_" + id ).val ( response.rowVersion );
-        $("#currentPrice_" + id ).text ( "Cena: " +  response.currentPrice + " $" );
+        $("#RowVersion_" + auctionID ).val ( response.rowVersion );
+        $("#currentPrice_" + auctionID ).text ( "Cena: " +  response.currentPrice + " $" );
         
-        connection.invoke ("NotifyUsers", id, auctionID);
+        connection.invoke ("NotifyUsers", auctionID);
 
       },
       error: function ( response ){
@@ -186,10 +189,9 @@ connection.on (
   /**
    * funkcija koja se poziva pri promeni cene aukcije sa auctionID-jem na kartici sa id-jem
    * 
-   * @param {int} id - id kartice proizvoda
    * @param {int} auctionID - id aukcije u bazi
    */
-  function (id, auctionID ) {
+  function (auctionID ) {
 
     var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
 
@@ -205,8 +207,8 @@ connection.on (
         console.log (response.rowVersion); 
         console.log (response.currentPrice); 
 
-        $("#RowVersion_" + id ).val ( response.rowVersion );
-        $("#currentPrice_" + id ).text ( "Cena: " +  response.currentPrice + " $" );
+        $("#RowVersion_" + auctionID ).val ( response.rowVersion );
+        $("#currentPrice_" + auctionID ).text ( "Cena: " +  response.currentPrice + " $" );
 
       },
       error: function ( response ){

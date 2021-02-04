@@ -37,7 +37,7 @@ namespace AuctionHouse.Controllers
         public async Task<IActionResult> Index()
         {
             var auctionHouseContext = _context.auctions.Include(a => a.owner).Include(a => a.winner).OrderByDescending ( a => a.createDate );
-            return View(await auctionHouseContext.ToListAsync());
+            return View( await auctionHouseContext.ToListAsync());
         }
 
         // GET: Auction/userId
@@ -193,15 +193,13 @@ namespace AuctionHouse.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    auctionToUpdate = await _context.auctions.Include(a => a.winner).FirstOrDefaultAsync(a => a.Id == id);
-
-                    var bids = await _context.bids.Where(b => b.auctionId == auctionToUpdate.Id).ToListAsync();
-
+                    auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a => a.bids).FirstOrDefaultAsync(a => a.Id == id);               
+    
                     UpdatedAuction resultAuction = new UpdatedAuction () {
                         currentPrice = auctionToUpdate.currentPrice,
                         RowVersion = auctionToUpdate.RowVersion,
                         winnerUsername = auctionToUpdate.winner.UserName,
-                        numberOfBids = bids.Count
+                        numberOfBids = auctionToUpdate.bids.Count()
                     };
 
                     return Json(resultAuction);
@@ -444,6 +442,7 @@ namespace AuctionHouse.Controllers
                 pageNumber = 1;
             }
 
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 auctions = auctions.Where(a => a.name.Contains(searchString) || a.description.Contains(searchString));
@@ -483,13 +482,15 @@ namespace AuctionHouse.Controllers
 
             }
 
-            auctions = auctions.OrderByDescending (a => a.createDate);
-            
+            if (String.IsNullOrEmpty(searchString) && String.IsNullOrEmpty(minPrice) && String.IsNullOrEmpty(maxPrice) && status == "-1"){
+                auctions = auctions.Where(a => a.state == Auction.AuctionState.READY || a.state == Auction.AuctionState.OPEN);
+            }
+
+            auctions = auctions.Include(a => a.winner).Include(a => a.bids).OrderByDescending (a => a.createDate);
 
             SearchedAuctionsModel searchedAuctionsModel = new SearchedAuctionsModel () {
                 auctions = await auctions.AsNoTracking().ToListAsync()
             };
-
             
             return PartialView("SearchedAuctions", await PaginatedList<Auction>.CreateAsync(auctions.AsNoTracking(), pageNumber ?? 1, pageSize));
 

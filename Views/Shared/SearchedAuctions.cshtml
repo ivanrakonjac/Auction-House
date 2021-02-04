@@ -40,14 +40,14 @@
         <div class="card-footer">
             <img src="~/images/ponude.png" width="32px" height="32px"/>
             
-            @if( item.bids == null || item.bids.Count == 0) {
+            @if( @item.bids.Count() == 0 ) {
             <small class="text-muted" id="lastBid_@item.Id">0 bids</small>
             }
-            else if ( item.bids.Count == 1 ) {
+            else if ( @item.bids.Count() == 1 ) {
                 <small class="text-muted" id="lastBid_@item.Id">1 bid by @item.winner.UserName</small>
             } 
-            else if ( item.bids.Count > 1 ) {
-                <small class="text-muted" id="lastBid_@item.Id">@item.numberOfBids bids, last by @item.winner.UserName</small>
+            else if ( @item.bids.Count() > 1 ) {
+                <small class="text-muted" id="lastBid_@item.Id">@item.bids.Count() bids, last by @item.winner.UserName</small>
             }
         </div>
         <a asp-action="Details"asp-controller="Auction" asp-route-id="@item.Id" class="btn btn-success btn-block mt-3 mb-3">VIDI DETALJE</a>

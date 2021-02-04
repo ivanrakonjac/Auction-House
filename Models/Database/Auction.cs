@@ -73,9 +73,6 @@ namespace AuctionHouse.Models.Database{
 
         public ICollection<Bid> bids {get; set;}
 
-        [NotMapped]
-        public int numberOfBids { get; set; }
-
     }
 
 

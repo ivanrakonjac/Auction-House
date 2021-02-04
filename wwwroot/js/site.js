@@ -34,7 +34,10 @@ function readURL(input) {
   });
 /* Fukncije koje se koriste da se odmah vidi slika po odabiru, a da ne ode u bazu -- KRAJ*/
 
-
+/**
+ * Funkcija koja salje AJAX zahtev za pretragu aukcija po nekom kriterijumu
+ * @param {int} pageNumber 
+ */
 function getSearchedAuctionsPages ( pageNumber ) {
 
   var searchString = $("#searchString").val ();
@@ -219,3 +222,10 @@ connection.on (
     })
   }
 );
+
+/**
+ * getSearchedAuctionsPages() nam aukcije za Index page
+ */
+$( document ).ready(function() {
+  getSearchedAuctionsPages();
+});

@@ -375,22 +375,51 @@ namespace AuctionHouse.Controllers
         public async Task<IActionResult> BuyTokens(){
 
             User loggedUser = await this.userManager.GetUserAsync(base.User);
+
+            var myTokensOrders = await _context.tokensOrders.Include(to => to.user).Where(to => to.userId == loggedUser.Id).ToListAsync();
+            
+            ViewBag.myTokensOrders = myTokensOrders;
+
             return View(loggedUser);
         }
 
         public async Task<IActionResult> AddTokens ( string type ){
 
+            const double silver = 18.99;
+            const double gold = 33.99;
+            const double platinum = 53.99;
+
             User loggedUser = await this.userManager.GetUserAsync(base.User);
+
+            TokensOrder tokensOrder = new TokensOrder(){
+                createDate = DateTime.Now,
+                userId = loggedUser.Id,
+                user = loggedUser
+            };
 
             if(type == "SILVER") {
                 loggedUser.tokens += 5;
+
+                tokensOrder.tokensNumber = 5;
+                tokensOrder.price = silver;
+
             }else if (type == "GOLD"){
                 loggedUser.tokens += 10;
+
+                tokensOrder.tokensNumber = 10;
+                tokensOrder.price = gold;
+
             }else if (type == "PLATINUM"){
                 loggedUser.tokens += 20;
+
+                tokensOrder.tokensNumber = 20;
+                tokensOrder.price = platinum;
+
             }else{
                 return RedirectToAction (nameof ( UserController.BuyTokens ), "User");
             }
+
+            _context.Add(tokensOrder);
 
             _context.Update(loggedUser);
             await _context.SaveChangesAsync();
@@ -398,6 +427,11 @@ namespace AuctionHouse.Controllers
             return RedirectToAction (nameof ( UserController.BuyTokens ), "User");
         }
 
+        public async Task<IActionResult> MyTokensOrders(){
+
+            User loggedUser = await this.userManager.GetUserAsync(base.User);
+            return View(loggedUser);
+        }
 
 
     }

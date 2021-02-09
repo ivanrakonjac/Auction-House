@@ -11,6 +11,7 @@ namespace AuctionHouse.Models.Database {
         public DbSet<Gender> genders { get; set; }
         public DbSet<Auction> auctions {get; set;}
         public DbSet<Bid> bids {get; set;}
+        public DbSet<TokensOrder> tokensOrders {get; set;}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,7 +24,8 @@ namespace AuctionHouse.Models.Database {
             builder.ApplyConfiguration(new AuctionConfiguration());
             
             builder.ApplyConfiguration(new BidConfiguration());
-        
+
+            builder.ApplyConfiguration(new TokensOrderConfiguration());  
         }
         
     }

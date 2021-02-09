@@ -98,11 +98,46 @@
 
 </div>
 
-<!--
-<ul>
-    <li data-id="1">Item 1 <div id="button-1"></div></li>
-    <li data-id="2">Item 2 <div id="button-2"></div></li>
-    <li data-id="3">Item 3 <div id="button-3"></div></li>
-    
-                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="GOLD" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
-</ul>-->
+@if(ViewBag.myTokensOrders.Count != 0){
+<div class="text-center mt-5 mb-5">
+    <h1>Your tokens orders</h1>
+    <p>- until now - </p>
+</div>
+
+<div class="row">
+    <div class=" mt-2  mb-1 col-sm-12 col-xl-12 text-center">
+
+            <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Id</th>
+                            <th scope="col">Tokens number</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Order date</th>
+                            <th scope="col">User</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    @{ var i = 1; }
+                    @foreach(var item in ViewBag.myTokensOrders)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@item.Id</td>  
+                            <td>@item.tokensNumber</td>
+                            <td>@item.price</td>
+                            <td>@item.createDate</td>
+                            <td>@item.user</td>
+                        </tr>
+                        i+=1;
+                    }
+                    </tbody>
+            </table>
+    </div>
+</div>
+}
+
+

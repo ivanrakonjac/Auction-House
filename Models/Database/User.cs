@@ -28,6 +28,8 @@ namespace AuctionHouse.Models.Database{
 
         public ICollection<Bid> myBids {get; set;}
 
+        public ICollection<TokensOrder> myTokensOrders {get; set;}
+
     }
 
     // Klasa koja mapira RegisterModel (koji dobijamo pri registraciji) u User entitet 

@@ -371,6 +371,14 @@ namespace AuctionHouse.Controllers
             return RedirectToAction (nameof ( HomeController.Index ), "Home");
         }
 
+        
+        public async Task<IActionResult> BuyTokens(string id){
+            return View();
+        }
+
+        
+
+
 
     }
 }

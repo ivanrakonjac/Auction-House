@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Buy tokens";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4">Welcome</h1>
+    <p>Here You can buy tokens for auctions!</p>
+</div>
+
+<div class="row">
+
+    <div class="col-sm-12">
+    
+        <div class="card-group">
+
+            <div class="card border-dark" style="background-color: silver;">
+
+                <div class="card-header text-center">SILVER TOKENS GROUP</div>
+                
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-5">WHAT YOU GET?</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" style="background-color: silver;">5 tokens (1 token == 100$)</li>
+                        <li class="list-group-item" style="background-color: silver;">Use them whenever You want.</li>
+                    </ul>
+                    <h4 class="text-center mt-5">Price:</h4>
+                    <h3 class="text-center">18.99 $</h3>
+                </div>
+
+                <div class="card-header"></div>   
+
+                <div class="p-2">
+                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="SILVER" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                </div>
+
+            </div>
+
+            <div class="card border-dark" style="background-color: gold;">
+
+                <div class="card-header text-center">GOLD TOKENS GROUP</div>
+                
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-5">WHAT YOU GET?</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" style="background-color: gold;">10 tokens (1 token == 100$)</li>
+                        <li class="list-group-item" style="background-color: gold;">Use them whenever You want.</li>
+                    </ul>
+                    <h4 class="text-center mt-5">Price:</h4>
+                    <h3 class="text-center">33.99 $</h3>
+                </div>
+
+                <div class="card-header"></div>    
+
+                <div class="p-2">
+                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="GOLD" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                </div>
+
+            </div>
+
+            <div class="card border-dark" style="background-color: #E5E4E2;">
+
+                <div class="card-header text-center">PLATINUM TOKENS GROUP</div>
+                
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-5">WHAT YOU GET?</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" style="background-color: #E5E4E2;">20 tokens (1 token == 100$)</li>
+                        <li class="list-group-item" style="background-color: #E5E4E2;">Use them whenever You want.</li>
+                    </ul>
+                    <h4 class="text-center mt-5">Price:</h4>
+                    <h3 class="text-center">53.99 $</h3>
+                </div>
+
+                <div class="card-header"></div>    
+
+                <div class="p-2">
+                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="PLATINUM" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                </div>
+
+            </div>
+
+        </div>
+
+        
+    </div>
+    
+</div>

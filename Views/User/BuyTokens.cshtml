@@ -1,10 +1,24 @@
+@model AuctionHouse.Models.Database.User
+
 @{
     ViewData["Title"] = "Buy tokens";
 }
 
+@{
+    // Za dodavanje signalR skripti, da JS ne bi javljao gresku
+    await Html.RenderPartialAsync ( "SignalRScriptsPartial" );
+}
+
+<script src = "https://www.paypal.com/sdk/js?client-id=ATxS0WT2n8WXjSUWHPJ8mlMIHJGgdLDvc9HZhWzJRYet90tLOTx8PR20iQNRN2No1ekFfctXXKEM-Eyw" data-sdk-integration-source="button-factory"></script>
+
 <div class="text-center mb-5">
     <h1 class="display-4">Welcome</h1>
     <p>Here You can buy tokens for auctions!</p>
+</div>
+
+<div class="mt-5 mb-5">
+    <span style="font-size: 170%">Your number of tokens: </span>
+    <span style="font-size: 170%" id="tokensNum_@Model.Id">@Model.tokens</span>
 </div>
 
 <div class="row">
@@ -29,8 +43,8 @@
 
                 <div class="card-header"></div>   
 
-                <div class="p-2">
-                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="SILVER" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                <div class="mt-5 p-2">
+                    <div id="paypal-silver"></div>
                 </div>
 
             </div>
@@ -51,8 +65,8 @@
 
                 <div class="card-header"></div>    
 
-                <div class="p-2">
-                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="GOLD" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                <div class="mt-5 p-2">
+                    <div id="paypal-gold"></div>
                 </div>
 
             </div>
@@ -73,8 +87,8 @@
 
                 <div class="card-header"></div>    
 
-                <div class="p-2">
-                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="PLATINUM" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+                <div class="mt-5 p-2">
+                    <div id="paypal-platinum"></div>
                 </div>
 
             </div>
@@ -83,5 +97,16 @@
 
         
     </div>
-    
+
 </div>
+
+<!--
+<ul>
+    <li data-id="1">Item 1 <div id="button-1"></div></li>
+    <li data-id="2">Item 2 <div id="button-2"></div></li>
+    <li data-id="3">Item 3 <div id="button-3"></div></li>
+    
+                    <a asp-action="AddTokens"asp-controller="User" asp-route-type="GOLD" class="btn btn-dark btn-block mt-3 mb-3">BUY</a>
+</ul>-->
+
+<div id="paypal"> </div>

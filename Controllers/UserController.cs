@@ -372,11 +372,31 @@ namespace AuctionHouse.Controllers
         }
 
         
-        public async Task<IActionResult> BuyTokens(string id){
-            return View();
+        public async Task<IActionResult> BuyTokens(){
+
+            User loggedUser = await this.userManager.GetUserAsync(base.User);
+            return View(loggedUser);
         }
 
-        
+        public async Task<IActionResult> AddTokens ( string type ){
+
+            User loggedUser = await this.userManager.GetUserAsync(base.User);
+
+            if(type == "SILVER") {
+                loggedUser.tokens += 5;
+            }else if (type == "GOLD"){
+                loggedUser.tokens += 10;
+            }else if (type == "PLATINUM"){
+                loggedUser.tokens += 20;
+            }else{
+                return RedirectToAction (nameof ( UserController.BuyTokens ), "User");
+            }
+
+            _context.Update(loggedUser);
+            await _context.SaveChangesAsync();
+            
+            return RedirectToAction (nameof ( UserController.BuyTokens ), "User");
+        }
 
 
 

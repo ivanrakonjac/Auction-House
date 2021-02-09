@@ -19,7 +19,9 @@ namespace AuctionHouse.Models.Database{
         public string gender {get; set; }
         [Display (Name = "Deleted by Admin")]
         [DefaultValue(false)]
-        public bool deletedByAdmin {get; set; } 
+        public bool deletedByAdmin {get; set; }
+
+        public int tokens { get; set; } 
 
         public ICollection<Auction> myPurchases {get; set;}
         public ICollection<Auction> myAuctions {get; set;}

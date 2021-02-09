@@ -3,8 +3,6 @@
 
 // Write your JavaScript code.
 
-var amountToPay = 0;
-
 // Pravljenje objekta konekcije za slanje poruka serveru i za primanje notifikacija
 var connection = new signalR.HubConnectionBuilder ( ).withUrl ( "/update" ).build ( );
 connection.start ( );
@@ -177,6 +175,15 @@ function bid ( auctionID ) {
         console.log (response.rowVersion); 
         console.log (response.currentPrice); 
 
+        if(typeof response === 'string' || response instanceof String){
+          if (!response.localeCompare("ERROR")) {
+            alert ("Nemate vise tokena!");
+            return;
+          }
+        }
+
+        
+
         $("#RowVersion_" + auctionID ).val ( response.rowVersion );
         $("#currentPrice_" + auctionID ).text ( "Cena: " +  response.currentPrice + " $" );
         $("#lastBid_" + auctionID ).text ( response.numberOfBids + " bids, last bid by " +  response.winnerUsername );
@@ -227,116 +234,122 @@ connection.on (
   }
 );
 
+
+
 /**
  * getSearchedAuctionsPages() nam aukcije za Index page
  */
 $( document ).ready(function() {
   if (document.location.href == 'https://localhost:5001/') {
     getSearchedAuctionsPages();
-  } 
-  
+  }
+  else if (document.location.href == 'https://localhost:5001/User/BuyTokens'){
+      /* Fukncije za paypal dugmad na buyTockens stranici */
+
+        /**
+       * Fukncija koja se poziva kada se izvrsi uspesna kupovina tokena
+       * param {string} tokenGroup - id aukcije u bazi
+       */
+      function bid ( tokenGroup ) {
+        var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
+
+        $.ajax ( {
+            type: "POST",
+            dataType: "html",
+            url: "/User/AddTokens",
+            data: {
+                "type" : tokenGroup,
+                "__RequestVerificationToken" : verificationToken
+            },
+            success: function ( response ){
+
+              //$("#RowVersion_" + auctionID ).val ( response.rowVersion );
+              alert ( "SUCCESS ");
+              location.reload();
+            },
+            error: function ( response ){
+                alert ( response );
+            }
+        })
+      }
+
+      [ '#paypal-silver' ].forEach(function(selector) { 
+
+        paypal.Buttons ( {
+            createOrder: function ( date, actions ){
+                return actions.order.create ( {
+                    purchase_units: [{
+                        amount: {
+                            value: 18.99
+                        }
+                    }]
+                })
+            },
+            onApprove: function ( data, actions ){
+                return actions.order.capture ( ).then(
+                    function ( details ) {
+                        //alert ( "SUCCESS " + details.payer.name.given_name );
+                        bid ("SILVER");
+                    }
+                )
+            }
+        } ).render ( selector );
+
+      });
+
+      [ '#paypal-gold' ].forEach(function(selector) { 
+
+        paypal.Buttons ( {
+            createOrder: function ( date, actions ){
+                return actions.order.create ( {
+                    purchase_units: [{
+                        amount: {
+                            value: 33.99
+                        }
+                    }]
+                })
+            },
+            onApprove: function ( data, actions ){
+                return actions.order.capture ( ).then(
+                    function ( details ) {
+                        //alert ( "SUCCESS " + details.payer.name.given_name )
+                        bid ("GOLD");
+                    }
+                )
+            }
+        } ).render ( selector );
+
+      });
+
+      [ '#paypal-platinum' ].forEach(function(selector) { 
+
+        paypal.Buttons ( {
+            createOrder: function ( date, actions ){
+                return actions.order.create ( {
+                    purchase_units: [{
+                        amount: {
+                            value: 53.99
+                        }
+                    }]
+                })
+            },
+            onApprove: function ( data, actions ){
+                return actions.order.capture ( ).then(
+                    function ( details ) {
+                        //alert ( "SUCCESS " + details.payer.name.given_name )
+                        bid ("PLATINUM");
+                    }
+                )
+            }
+        } ).render ( selector );
+
+      });
+
+      /* Fukncije za paypal dugmad na buyTockens strani - kraj */
+  }
+    
 });
 
-/* Fukncije za paypal dugmad na buyTockens stranici */
 
 
-/**
- * Fukncija koja se poziva kada se izvrsi uspesna kupovina tokena
- * @param {string} tokenGroup - id aukcije u bazi
- */
-function bid ( tokenGroup ) {
-  var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
 
-  $.ajax ( {
-      type: "POST",
-      dataType: "html",
-      url: "/User/AddTokens",
-      data: {
-          "type" : tokenGroup,
-          "__RequestVerificationToken" : verificationToken
-      },
-      success: function ( response ){
-
-        //$("#RowVersion_" + auctionID ).val ( response.rowVersion );
-        alert ( "SUCCESS ");
-        location.reload();
-      },
-      error: function ( response ){
-          alert ( response );
-      }
-  })
-}
-
-[ '#paypal-silver' ].forEach(function(selector) { 
-
-  paypal.Buttons ( {
-      createOrder: function ( date, actions ){
-          return actions.order.create ( {
-              purchase_units: [{
-                  amount: {
-                      value: 18.99
-                  }
-              }]
-          })
-      },
-      onApprove: function ( data, actions ){
-          return actions.order.capture ( ).then(
-              function ( details ) {
-                  //alert ( "SUCCESS " + details.payer.name.given_name );
-                  bid ("SILVER");
-              }
-          )
-      }
-  } ).render ( selector );
-
-});
-
-[ '#paypal-gold' ].forEach(function(selector) { 
-
-  paypal.Buttons ( {
-      createOrder: function ( date, actions ){
-          return actions.order.create ( {
-              purchase_units: [{
-                  amount: {
-                      value: 33.99
-                  }
-              }]
-          })
-      },
-      onApprove: function ( data, actions ){
-          return actions.order.capture ( ).then(
-              function ( details ) {
-                  //alert ( "SUCCESS " + details.payer.name.given_name )
-                  bid ("GOLD");
-              }
-          )
-      }
-  } ).render ( selector );
-
-});
-
-[ '#paypal-platinum' ].forEach(function(selector) { 
-
-  paypal.Buttons ( {
-      createOrder: function ( date, actions ){
-          return actions.order.create ( {
-              purchase_units: [{
-                  amount: {
-                      value: 53.99
-                  }
-              }]
-          })
-      },
-      onApprove: function ( data, actions ){
-          return actions.order.capture ( ).then(
-              function ( details ) {
-                  //alert ( "SUCCESS " + details.payer.name.given_name )
-                  bid ("PLATINUM");
-              }
-          )
-      }
-  } ).render ( selector );
-
-});
-
-/* Fukncije za paypal dugmad na buyTockens strani - kraj */

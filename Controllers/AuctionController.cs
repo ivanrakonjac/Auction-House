@@ -170,6 +170,7 @@ namespace AuctionHouse.Controllers
                 return Json (false);
             }
 
+
             var auctionToUpdate = await _context.auctions.Include(a => a.winner).Include(a=> a.owner).FirstOrDefaultAsync(a => a.Id == id);
 
             if (auctionToUpdate == null)
@@ -184,6 +185,8 @@ namespace AuctionHouse.Controllers
 
                     User loggedUser = await this._userManager.GetUserAsync(base.User);
 
+                    if(loggedUser.tokens <= 0) return Json("ERROR");
+
                     auctionToUpdate.currentPrice += incCurrentPrice;
                     auctionToUpdate.winner = loggedUser;
                     auctionToUpdate.winnerId = loggedUser.Id;
@@ -197,6 +200,8 @@ namespace AuctionHouse.Controllers
                     };
 
                     _context.Add(bid);
+
+                    loggedUser.tokens -= 1;
 
                     await _context.SaveChangesAsync();
 

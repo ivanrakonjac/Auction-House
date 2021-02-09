@@ -53,6 +53,7 @@ namespace AuctionHouse.Controllers
         }
 
         // GET: Auction/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -63,7 +64,13 @@ namespace AuctionHouse.Controllers
             var auction = await _context.auctions
                 .Include(a => a.owner)
                 .Include(a => a.winner)
+                .Include(a => a.bids)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            IEnumerable<Bid> bids = await _context.bids.Include (b => b.user).Where (b => b.auctionId == id).OrderByDescending (b => b.bidDate).Take(10).ToListAsync();
+            ViewData["bids"] = bids;
+
+
             if (auction == null)
             {
                 return NotFound();
@@ -242,18 +249,19 @@ namespace AuctionHouse.Controllers
         {
             
             var auction = await _context.auctions.FindAsync(id);
+            
 
             if (id != auction.Id)
             {
                 return NotFound();
             }
 
-            if ( auction.state != Auction.AuctionState.DRAFT) {
+            /*if ( auction.state != Auction.AuctionState.DRAFT) {
                 auctionModel.base64Data = Convert.ToBase64String(auction.image);
                 ModelState.AddModelError ("", "This auction can not be edited.");
                 ModelState.AddModelError ("", "Sorry!");
                 return View (auctionModel);
-            }
+            }*/
 
             if (ModelState.IsValid)
             {

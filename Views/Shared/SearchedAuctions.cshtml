@@ -50,7 +50,7 @@
                 <small class="text-muted" id="lastBid_@item.Id">@item.bids.Count() bids, last by @item.winner.UserName</small>
             }
         </div>
-        <a asp-action="Details"asp-controller="Auction" asp-route-id="@item.Id" class="btn btn-success btn-block mt-3 mb-3">VIDI DETALJE</a>
+        <a asp-action="Details"asp-controller="Auction" asp-route-id="@item.Id" class="btn btn-success btn-block mt-3 mb-3">VIEW DETAILS</a>
 
         <input type="hidden" class="auctionId" asp-for="@item.Id" />
         <input type="hidden" id="RowVersion_@item.Id" asp-for="@item.RowVersion" />

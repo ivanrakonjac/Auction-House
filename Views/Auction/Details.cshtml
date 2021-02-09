@@ -7,6 +7,16 @@
 }
 
 @{
+
+    var bids = ViewData["bids"];
+}
+
+@{
+    // Za dodavanje signalR skripti, da JS ne bi javljao gresku
+    await Html.RenderPartialAsync ( "SignalRScriptsPartial" );
+}
+
+@{
     string id = "";
     var role = "";
     foreach (Claim claim in User.Claims){
@@ -25,92 +35,124 @@
 
 
 
-<h1>Details</h1>
 
-<div>
-    <h4>Auction</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.image)
-        </dt>
-        <dd class = "col-sm-10">
+<div class="row">
+
+    <div class="col-sm-12 col-xl-6">
+        <img src="data:image/png;base64,@base64Data" width="100%" class="rounded mb-2 mt-2"/>
+    </div>
+
+    <div class="col-sm-12 col-xl-6">
+        <h1 class="text-center">@Html.DisplayFor(model => model.name)</h1>
+
+        <div class="col-sm-12 text-center mt-5 p-2 rounded" id="timeToEndDiv_@Model.Id" >
+            <img src="~/images/clock.png" width="64px" height="64px"/> 
+            <span class="card-text" id="dani_@Model.Id" style="font-size: 170%"></span>
+            <span class="card-text" id="sati_@Model.Id" style="font-size: 170%"></span>
+            <span class="card-text" id="minuti_@Model.Id" style="font-size: 170%"></span>
+            <span class="card-text" id="sekunde_@Model.Id" style="font-size: 170%"></span>
+        </div>
+
+        <h2 class="card-header mt-4 mb-3 text-center" id="currentPrice_@Model.Id">Cena: @Model.currentPrice $</h2>
+
+        <div class="text-center">
+            <img src="~/images/ponude.png" width="32px" height="32px"/>
             
-        </dd>
-        <dt class = "col-sm-4">
-            <img src="data:image/png;base64,@base64Data" width="100%" class="mb-2 mt-2"/>
-        </dt>
-        <dd class = "col-sm-8">
-            
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.startPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.startPrice) $
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.currentPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.currentPrice) $
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.createDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.createDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.openDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.openDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.closeDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.closeDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.state)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.state)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.owner)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.owner.UserName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.winner)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.winner.Id)
-        </dd>
-    </dl>
+            @if( @Model.bids.Count() == 0 ) {
+                <small class="text-muted" id="lastBid_@Model.Id">0 bids</small>
+            }
+            else if ( @Model.bids.Count() == 1 ) {
+                <small class="text-muted" id="lastBid_@Model.Id">1 bid by @Model.winner.UserName</small>
+            } 
+            else if ( @Model.bids.Count() > 1 ) {
+                <small class="text-muted" id="lastBid_@Model.Id">@Model.bids.Count() bids, last by @Model.winner.UserName</small>
+            }
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg mt-5" id="bidButton_@Model.Id" onclick="bid(@Model.Id, @Model.Id)">BID</button>
+        
+    </div>
+
+    <div class="col-sm-12 col-xl-6">
+            <div class="card border-dark mt-2 mb-1 col-sm-12">
+                <div class="card-header">@Html.DisplayNameFor(model => model.description)</div>
+                <div class="card-body text-dark">
+                    <p class="card-text">@Html.DisplayFor(model => model.description)</p>
+                </div>
+            </div>
+
+            <div class="card border-dark mb-1 col-sm-12">
+                <div class="card-header">Overview</div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">@Html.DisplayNameFor(model => model.startPrice):</h5>
+                    <p class="card-text">@Html.DisplayFor(model => model.startPrice) $</p>
+                </div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">@Html.DisplayNameFor(model => model.createDate):</h5>
+                    <p class="card-text">@Html.DisplayFor(model => model.createDate)</p>
+                </div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">@Html.DisplayNameFor(model => model.owner):</h5>
+                    <p class="card-text">@Html.DisplayFor(model => model.owner.UserName)</p>
+                </div>
+            </div>
+    </div>
+
+
+    <div class="card border-dark mt-2  mb-1 col-sm-12 col-xl-6 text-center">
+
+        <div class="card-header">Auctions</div>
+
+        <div class="card-body text-dark">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Bid date</th>
+                        <th scope="col">User</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+        
+                @for (int i = 1; i < @Model.bids.Count() && i < 11; i++)
+                {
+                    <tr>
+                        <th scope="row">@i</th>
+                        <td>@Model.bids.ElementAt(@Model.bids.Count() - i ).Id</td>
+                        <td>@Model.bids.ElementAt(@Model.bids.Count() - i ).price</td>
+                        <td>@Model.bids.ElementAt(@Model.bids.Count() - i ).bidDate</td>
+                        <td>@Model.bids.ElementAt(@Model.bids.Count() - i ).user</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+
 </div>
+
 <div>
     @if ( role == "User" ) {
         <a asp-action="Edit" asp-route-id=@Model.Id>Edit | </a>
-        <a asp-action="MyAuctions" asp-route-id=@id>Back to List</a>
-    }else{
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="MyAuctions" asp-route-id=@id>Back to MyAuctions List</a>
+    }else if ( role == "Admin" ) {
+        <a href="https://localhost:5001/">Home | </a>
+        <a asp-action="Index">Back to all auctions List</a>
     }
     
 </div>
+
+<input type="hidden" class="auctionId" asp-for="@Model.Id" />
+<input type="hidden" id="RowVersion_@Model.Id" asp-for="@Model.RowVersion" />
+
+<input type="hidden" id="godinaCloseDate_@Model.Id" value="@Model.closeDate.Year">
+<input type="hidden" id="mesecCloseDate_@Model.Id" value="@Model.closeDate.Month">
+<input type="hidden" id="danCloseDate_@Model.Id" value="@Model.closeDate.Day">
+<input type="hidden" id="satCloseDate_@Model.Id" value="@Model.closeDate.Hour">
+<input type="hidden" id="minutCloseDate_@Model.Id" value="@Model.closeDate.Minute">
+<input type="hidden" id="sekundCloseDate_@Model.Id" value="@Model.closeDate.Second">

@@ -152,6 +152,8 @@ function updateTimeToEndOfAuction ( ) {
 setInterval ( updateTimeToEndOfAuction, 1000 );
 
 
+
+
 /**
  * Fukncija koja se poziva kada user pritisne BID na kartici proizvoda
  * @param {int} auctionID - id aukcije u bazi
@@ -227,5 +229,8 @@ connection.on (
  * getSearchedAuctionsPages() nam aukcije za Index page
  */
 $( document ).ready(function() {
-  getSearchedAuctionsPages();
+  if (document.location.href == 'https://localhost:5001/') {
+    getSearchedAuctionsPages();
+  } 
+  
 });

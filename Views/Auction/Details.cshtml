@@ -95,6 +95,15 @@
                     <h5 class="card-title">@Html.DisplayNameFor(model => model.owner):</h5>
                     <p class="card-text">@Html.DisplayFor(model => model.owner.UserName)</p>
                 </div>
+                @if(@Model.state == AuctionHouse.Models.Database.Auction.AuctionState.SOLD 
+                    || @Model.state == AuctionHouse.Models.Database.Auction.AuctionState.EXPIRED ){
+
+                    <div class="card-body text-dark">
+                        <h5 class="card-title">Winner:</h5>
+                        <p class="card-text">@Html.DisplayFor(model => model.winner.UserName)</p>
+                    </div>
+
+                }
             </div>
     </div>
 

@@ -46,17 +46,17 @@ function getSearchedAuctionsPages ( pageNumber ) {
   var status = $("#selectedState").val ();
 
   $.ajax ( {
-    type: "GET",
-    url: "/Auction/Search?searchString=" + searchString + "&minPrice=" + minPrice + 
-    "&maxPrice=" + maxPrice + "&status=" + status + "&pageNumber=" + pageNumber,
-    dataType: "text",
-    success: function ( response ){
-      $("#searchedResult").html (response);
-    },
-    error: function ( response ){
-        alert ( "response" );
-    }
-})
+      type: "GET",
+      url: "/Auction/Search?searchString=" + searchString + "&minPrice=" + minPrice + 
+      "&maxPrice=" + maxPrice + "&status=" + status + "&pageNumber=" + pageNumber,
+      dataType: "text",
+      success: function ( response ){
+        $("#searchedResult").html (response);
+      },
+      error: function ( response ){
+          alert ( "response" );
+      }
+  })
 
 }
 
@@ -67,6 +67,39 @@ $(".reagujNaEnter").on('keyup', function (e) {
       getSearchedAuctionsPages();
   }
 });
+
+
+/**
+ * Funkcija koja salje AJAX zahtev za promenu status aukcije u SOLD/EXPIRED po isteku vremena
+ * @param {int} auctionId - id aukcije u bazi 
+ */
+function auctionExpired ( auctionId ) {
+
+  var state = $("#auctionState_" + auctionId ).val ( );
+
+  if (state != "READY") return;
+
+  var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
+
+  
+
+  $.ajax ( {
+    type: "POST",
+    dataType: "json",
+    url: "/Auction/finishTheAuction",
+    data: {
+        "auctionId" : auctionId,
+        "__RequestVerificationToken" : verificationToken
+    },
+    success: function ( response ){
+      //alert ("Ubijena"); 
+    },
+    error: function ( response ){
+        alert ( response );
+    }
+})
+
+}
 
 
 /**
@@ -93,6 +126,7 @@ function getTimeToEndOfAuction ( id ){
   if ( timeToEnd <= 0) {
     $('#bidButton_' + id ).prop('disabled', true);
     $("#timeToEndDiv_" + id ).removeClass('bg-danger');
+    auctionExpired (id)
     return;
   }
 

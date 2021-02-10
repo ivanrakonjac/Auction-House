@@ -54,6 +54,7 @@
 
         <input type="hidden" class="auctionId" asp-for="@item.Id" />
         <input type="hidden" id="RowVersion_@item.Id" asp-for="@item.RowVersion" />
+        <input type="hidden" id="auctionState_@item.Id" value="@item.state">
 
         <input type="hidden" id="godinaCloseDate_@item.Id" value="@item.closeDate.Year">
         <input type="hidden" id="mesecCloseDate_@item.Id" value="@item.closeDate.Month">

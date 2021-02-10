@@ -509,6 +509,27 @@ namespace AuctionHouse.Controllers
 
         }
 
+        [AllowAnonymous]
+        public async Task<Boolean> FinishTheAuction (int auctionId) {
+
+            Auction auction = await _context.auctions.FirstAsync(a => a.Id == auctionId);
+
+            if (auction.state == Auction.AuctionState.READY) {
+                Bid bid = await _context.bids.FirstOrDefaultAsync(b => b.auctionId == auctionId);
+
+                if (bid != null) {
+                    auction.state = Auction.AuctionState.SOLD;
+                }else {
+                    auction.state = Auction.AuctionState.EXPIRED;
+                }
+
+                _context.Update(auction);
+                await _context.SaveChangesAsync();
+            } 
+
+            return true;
+        }
+
     }
 }
 /*

@@ -77,7 +77,7 @@ function auctionExpired ( auctionId ) {
 
   var state = $("#auctionState_" + auctionId ).val ( );
 
-  if (state != "READY") return;
+  if (state != "OPEN") return;
 
   var verificationToken = $("input[name='__RequestVerificationToken']").val ( );
 

@@ -261,12 +261,12 @@ namespace AuctionHouse.Controllers
                 return NotFound();
             }
 
-            /*if ( auction.state != Auction.AuctionState.DRAFT) {
+            if ( auction.state != Auction.AuctionState.DRAFT) {
                 auctionModel.base64Data = Convert.ToBase64String(auction.image);
                 ModelState.AddModelError ("", "This auction can not be edited.");
                 ModelState.AddModelError ("", "Sorry!");
                 return View (auctionModel);
-            }*/
+            }
 
             if (ModelState.IsValid)
             {
@@ -441,10 +441,24 @@ namespace AuctionHouse.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
         // GET: Searched Auctions
         [AllowAnonymous]
         public async Task<IActionResult> Search ( string searchString, string minPrice, string maxPrice, string status, int? pageNumber )
         {
+
+            ICollection<Auction> auctionsList =  _context.auctions.Where(a => a.state == Auction.AuctionState.READY).ToList();
+
+            foreach (var auction in auctionsList) {
+                int res = DateTime.Compare(DateTime.Now, auction.openDate);
+                if(res > 0){
+                    auction.state = Auction.AuctionState.OPEN;
+                    _context.Update(auction);
+                }
+                
+            }
+            await _context.SaveChangesAsync();
+
             ViewData["CurrentFilter"] = searchString;
             int pageSize = 6;
 
@@ -491,12 +505,16 @@ namespace AuctionHouse.Controllers
                 else if( status == "ready" ){
                     auctions = auctions.Where(a => a.state == Auction.AuctionState.READY);
                 }
+                else if( status == "which_I_bought" ){
+                    string loggedUserId = User.FindFirst ("id").Value;
+                    auctions = auctions.Where(a => a.winnerId == loggedUserId).Where(a => a.state == Auction.AuctionState.SOLD);
+                }
                 
 
             }
 
             if (String.IsNullOrEmpty(searchString) && String.IsNullOrEmpty(minPrice) && String.IsNullOrEmpty(maxPrice) && status == "-1"){
-                auctions = auctions.Where(a => a.state == Auction.AuctionState.READY || a.state == Auction.AuctionState.OPEN);
+                auctions = auctions.Where(a => a.state == Auction.AuctionState.OPEN);
             }
 
             auctions = auctions.Include(a => a.winner).Include(a => a.bids).OrderByDescending (a => a.createDate);
@@ -514,7 +532,7 @@ namespace AuctionHouse.Controllers
 
             Auction auction = await _context.auctions.FirstAsync(a => a.Id == auctionId);
 
-            if (auction.state == Auction.AuctionState.READY) {
+            if (auction.state == Auction.AuctionState.OPEN) {
                 Bid bid = await _context.bids.FirstOrDefaultAsync(b => b.auctionId == auctionId);
 
                 if (bid != null) {
@@ -529,6 +547,7 @@ namespace AuctionHouse.Controllers
 
             return true;
         }
+
 
     }
 }

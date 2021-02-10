@@ -6,20 +6,32 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AuctionHouse.Models;
+using AuctionHouse.Models.Database;
 
 namespace AuctionHouse.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly AuctionHouseContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(AuctionHouseContext context, ILogger<HomeController> logger)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
+            /*ICollection<Auction> auctions =  _context.auctions.Where(a => a.state == Auction.AuctionState.READY)
+                                                            .Where(a => a.openDate < DateTime.Now).ToList();
+
+            foreach (var auction in auctions) {
+                auction.state = Auction.AuctionState.OPEN;
+                _context.Update(auction);
+            }
+            _context.SaveChangesAsync();*/
+
             return View();
         }
 

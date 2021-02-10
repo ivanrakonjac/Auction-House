@@ -45,13 +45,17 @@
     <div class="col-sm-12 col-xl-6">
         <h1 class="text-center">@Html.DisplayFor(model => model.name)</h1>
 
-        <div class="col-sm-12 text-center mt-5 p-2 rounded" id="timeToEndDiv_@Model.Id" >
-            <img src="~/images/clock.png" width="64px" height="64px"/> 
-            <span class="card-text" id="dani_@Model.Id" style="font-size: 170%"></span>
-            <span class="card-text" id="sati_@Model.Id" style="font-size: 170%"></span>
-            <span class="card-text" id="minuti_@Model.Id" style="font-size: 170%"></span>
-            <span class="card-text" id="sekunde_@Model.Id" style="font-size: 170%"></span>
-        </div>
+        @if (@Model.state == AuctionHouse.Models.Database.Auction.AuctionState.OPEN) {
+            <div class="col-sm-12 text-center mt-5 p-2 rounded" id="timeToEndDiv_@Model.Id" >
+                <img src="~/images/clock.png" width="64px" height="64px"/> 
+                <span class="card-text" id="dani_@Model.Id" style="font-size: 170%"></span>
+                <span class="card-text" id="sati_@Model.Id" style="font-size: 170%"></span>
+                <span class="card-text" id="minuti_@Model.Id" style="font-size: 170%"></span>
+                <span class="card-text" id="sekunde_@Model.Id" style="font-size: 170%"></span>
+            </div>
+        }
+
+        
 
         <h2 class="card-header mt-4 mb-3 text-center" id="currentPrice_@Model.Id">Cena: @Model.currentPrice $</h2>
 
@@ -147,8 +151,8 @@
 
 <div>
     @if ( role == "User" ) {
-        <a asp-action="Edit" asp-route-id=@Model.Id>Edit | </a>
-        <a asp-action="MyAuctions" asp-route-id=@id>Back to MyAuctions List</a>
+        <a href="https://localhost:5001/">Home | </a>
+        <a asp-action="MyAuctions" asp-route-id=@id>Go to MyAuctions List</a>
     }else if ( role == "Admin" ) {
         <a href="https://localhost:5001/">Home | </a>
         <a asp-action="Index">Back to all auctions List</a>

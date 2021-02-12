@@ -1,10 +1,11 @@
 # Auction House portal
 
-Scalable web application written in C# .NET Core MVC Framework. 
+A scalable web application is written in C# .NET Core MVC Framework. 
 
 For production, was used MSSQL Server relation database accessed by Entity Framework Core ORM and LINQ. 
 
-Application has interesting features like concurrent bidding, PayPal paying, and SignalR push notifications. 
+Application has interesting features like concurrent bidding, PayPal paying, and SignalR push notifications.
+
 
 ## Index
 
